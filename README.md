@@ -1,17 +1,31 @@
-# Helldivers International Randomizer for Windows
+<p align="center"><img src="assets/banner.png" alt="Helldivers International" width="900"></p>
+<h1 align="center">Helldivers International Randomizer</h1>
+<p align="center"><em>Randomize the voice and language of each Helldiver slot. A companion utility for the Helldivers International mod.</em></p>
+<p align="center"><a href="https://github.com/IHanfoxI/helldivers-international-randomizer-windows/raw/refs/heads/main/HelldiversInternational-Randomizer.exe"><img src="https://img.shields.io/badge/Download-Windows%20EXE-20804a?style=for-the-badge&logo=windows" alt="Download EXE"></a> <a href="https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions"><img src="https://img.shields.io/github/actions/workflow/status/IHanfoxI/helldivers-international-randomizer-windows/build-randomizer.yml?branch=main&style=for-the-badge&logo=githubactions&label=Windows%20Build" alt="Build status"></a></p>
 
-This repository contains the source and build workflow for the Windows Randomizer executable. A prebuilt `HelldiversInternational-Randomizer.exe` is included in the repository root for review and installation. GitHub Actions rebuilds it from the Python source with PyInstaller. No game audio is included.
+| [English](README.md) | [Español · ES](README.es.md) | [Español LATAM · MS](README.ms.md) | [日本語 · JP](README.jp.md) | [Deutsch · DE](README.de.md) | [Français · FR](README.fr.md) | [Italiano · IT](README.it.md) | [Português · BP](README.bp.md) | [简体中文 · CN](README.cn.md) | [Русский · RU](README.ru.md) | [한국어 · KO](README.ko.md) |
 
-## Build
+---
 
-Run the `build-windows` job in `.github/workflows/build-randomizer.yml` on GitHub Actions, or use the same steps on Windows with Python 3.12. The build installs `numpy`, `lz4`, and `pyinstaller`, then fetches `hd2-audio-modder` from its public repository at pinned commit `c408a44` before packaging.
+## 🎮 What it does
 
-The workflow smoke-launches the resulting application and uploads `HelldiversInternational-Randomizer.exe` as an artifact. The checked-in executable is the Windows artifact from that successful workflow run. The build does not bundle Helldivers 2 audio or modify game files.
+Randomizes voice type and language across the four Helldiver voice slots, then writes patch files into the Helldivers 2 data folder. Supports all nine in-game languages and, when included in the selected mod, Russian and Korean fandubs.
 
-## Source files
+## 🚀 Install and use
 
-- `randomizer_gui.py`: Tkinter interface.
-- `randomize_voices.py`: randomization and patch-writing logic.
-- `build_mod.py`: shared parser and patch-writing functions imported by the randomizer.
-- `voice_map.json`, `voice_crosswalk.json`, `grunt_packs.json`: voice and mapping data embedded in the executable.
-- `.github/workflows/build-randomizer.yml`: reproducible Windows and Linux packaging workflow.
+1. Download **HelldiversInternational-Randomizer.exe** with the button above.
+2. Open it and select your mod folder (contains **manifest.json**).
+3. Select the Helldivers 2 **data** folder (contains **bundles.nxa**).
+4. Choose options and click **Randomize**.
+
+If you deploy or update the main mod through Arsenal afterward, run the Randomizer again.
+
+## 🛡️ Source and build
+
+The executable is built from this repository’s Python source by GitHub Actions. The Windows smoke test passed. It contains no game audio; when run, it reads the installed mod and writes patch files.
+
+GitHub Actions uses Python 3.12 and PyInstaller. The audio parser is fetched from its public repository at pinned commit **c408a44**. No game assets are bundled.
+
+**SHA-256:** A3005AADDF57AE3EE7208DCDFDDBEBC4030D5C5C415C296132A03B1E6D094D62
+
+[Source code](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [Build workflow](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [Successful Windows build](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36000112609)
