@@ -1,12 +1,12 @@
 # Helldivers International Randomizer for Windows
 
-This repository contains the source and build workflow for the Windows Randomizer executable. The executable is built from Python source with PyInstaller in GitHub Actions; no prebuilt executable or game audio is included here.
+This repository contains the source and build workflow for the Windows Randomizer executable. A prebuilt `HelldiversInternational-Randomizer.exe` is included in the repository root for review and installation. GitHub Actions rebuilds it from the Python source with PyInstaller. No game audio is included.
 
 ## Build
 
 Run the `build-windows` job in `.github/workflows/build-randomizer.yml` on GitHub Actions, or use the same steps on Windows with Python 3.12. The build installs `numpy`, `lz4`, and `pyinstaller`, then fetches `hd2-audio-modder` from its public repository at pinned commit `c408a44` before packaging.
 
-The workflow smoke-launches the resulting application and uploads `HelldiversInternational-Randomizer.exe` as an artifact. It does not bundle Helldivers 2 audio or modify game files during the build.
+The workflow smoke-launches the resulting application and uploads `HelldiversInternational-Randomizer.exe` as an artifact. The checked-in executable is the Windows artifact from that successful workflow run. The build does not bundle Helldivers 2 audio or modify game files.
 
 ## Source files
 
