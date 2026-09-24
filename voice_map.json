@@ -1,0 +1,56 @@
+{
+  "us": {
+    "helldiver_soldier_female1_VO": "76b0a0e66d61aa15",
+    "helldiver_soldier_male1_VO": "b98c5b68db4cca84",
+    "helldiver_purist_VO": "ce6b3d08283efc3d",
+    "helldiver_soldier_female2_VO": "e8e43494a3d38e6c"
+  },
+  "ms": {
+    "helldiver_purist_VO": "14b1ec628e1dbf5f",
+    "helldiver_soldier_female1_VO": "479cdc9a56264cee",
+    "helldiver_soldier_female2_VO": "56b0e5b16d14983d",
+    "helldiver_soldier_male1_VO": "f6246b91db354d5d"
+  },
+  "es": {
+    "helldiver_purist_VO": "09f4d245bf5ff045",
+    "helldiver_soldier_female2_VO": "39d1dfd1a5549726",
+    "helldiver_soldier_male1_VO": "56e94a483a4e0948",
+    "helldiver_soldier_female1_VO": "c8b4e52b10ba22e9"
+  },
+  "cn": {
+    "helldiver_soldier_male1_VO": "1088df18bc9c6aa4",
+    "helldiver_purist_VO": "146ca4d77c5c2962",
+    "helldiver_soldier_female2_VO": "4d76aa3ea6d88cda",
+    "helldiver_soldier_female1_VO": "7848f5a1764b7fad"
+  },
+  "it": {
+    "helldiver_purist_VO": "1b0be8c47db66a01",
+    "helldiver_soldier_female2_VO": "d68267cf5fc8858c",
+    "helldiver_soldier_male1_VO": "eeb97bbb04850174",
+    "helldiver_soldier_female1_VO": "f94a29734f9fa7c3"
+  },
+  "jp": {
+    "helldiver_soldier_female1_VO": "2b6904ecb991fcf1",
+    "helldiver_soldier_male1_VO": "395e439fc282bc37",
+    "helldiver_purist_VO": "432afdb12428b80e",
+    "helldiver_soldier_female2_VO": "cd606908b03291f4"
+  },
+  "de": {
+    "helldiver_soldier_female1_VO": "3c346e5828ed8222",
+    "helldiver_soldier_male1_VO": "76a8d181d1e7fb00",
+    "helldiver_purist_VO": "81a89b5d3e0e39ee",
+    "helldiver_soldier_female2_VO": "ad28c21c07eeb681"
+  },
+  "fr": {
+    "helldiver_soldier_male1_VO": "42a347650db35633",
+    "helldiver_soldier_female1_VO": "44ca4d04a7ff288a",
+    "helldiver_soldier_female2_VO": "7a9ef8918e21b21e",
+    "helldiver_purist_VO": "f1fd3eccea443412"
+  },
+  "bp": {
+    "helldiver_purist_VO": "9481a558b15236d9",
+    "helldiver_soldier_female2_VO": "970d09e0f5dbcd49",
+    "helldiver_soldier_female1_VO": "b318fa106b64fb99",
+    "helldiver_soldier_male1_VO": "e5128562cf02577c"
+  }
+}

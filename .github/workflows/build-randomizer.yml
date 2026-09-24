@@ -1,0 +1,131 @@
+name: build randomizer exe
+
+on:
+  workflow_dispatch: {}
+  push:
+    paths:
+      - randomizer_gui.py
+      - randomize_voices.py
+      - build_mod.py
+      - voice_map.json
+      - voice_crosswalk.json
+      - grunt_packs.json
+      - tools/hd2-audio-modder/**
+      - .github/workflows/build-randomizer.yml
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # tools/ is gitignored (vendored third-party tool, not ours to commit) --
+      # clone the exact commit the local repo is pinned to instead.
+      - name: fetch hd2-audio-modder
+        run: |
+          git clone https://github.com/RaidingForPants/hd2-audio-modder.git tools/hd2-audio-modder
+          git -C tools/hd2-audio-modder checkout c408a44
+
+      - run: pip install numpy lz4 pyinstaller
+
+      # Shipping tools/hd2-audio-modder as --add-data (real files, loaded via
+      # the same sys.path.insert() the unfrozen script uses) made every import
+      # inside it invisible to PyInstaller's static analysis -- one missing
+      # hidden-import per CI round-trip (slim, lz4.block, wave, then
+      # logging.handlers...). Flattening the files next to the entry script
+      # instead puts them on the analyzer's normal search path, so the usual
+      # recursive graph walk (and lz4/numpy's own PyInstaller hooks) finds
+      # everything the way it would for any other local module.
+      - name: flatten hd2-audio-modder next to the entry script
+        run: |
+          Copy-Item tools/hd2-audio-modder/*.py .
+          Copy-Item tools/hd2-audio-modder/backend -Destination backend -Recurse
+
+      - name: build exe
+        run: >
+          pyinstaller --onefile --windowed
+          --name HelldiversInternational-Randomizer
+          --add-data "voice_map.json;."
+          --add-data "voice_crosswalk.json;."
+          --add-data "grunt_packs.json;."
+          randomizer_gui.py
+
+      - name: smoke test (window must open and stay up)
+        shell: pwsh
+        run: |
+          Remove-Item dist\randomizer_crash.log -ErrorAction SilentlyContinue
+          $p = Start-Process -FilePath .\dist\HelldiversInternational-Randomizer.exe -PassThru
+          Start-Sleep -Seconds 5
+          # HasExited alone is not enough: an unhandled exception under
+          # --windowed can leave the process parked on a Windows crash
+          # dialog instead of exiting, which would read as "still alive".
+          $crashed = (Test-Path dist\randomizer_crash.log) -or $p.HasExited
+          if ($crashed) {
+            Write-Host "crashed or exited early (exitcode=$($p.ExitCode))"
+            Get-Content dist\randomizer_crash.log -ErrorAction SilentlyContinue
+            Stop-Process -Id $p.Id -ErrorAction SilentlyContinue
+            exit 1
+          }
+          Stop-Process -Id $p.Id
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HelldiversInternational-Randomizer-windows
+          path: dist/HelldiversInternational-Randomizer.exe
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Ubuntu's system python3 + python3-tk is a safer bet for a bundled
+      # Tk than actions/setup-python's Linux builds (not guaranteed to carry
+      # _tkinter). Ubuntu's glibc is older than a rolling release like
+      # CachyOS's, and a binary built against an older glibc runs fine on a
+      # newer one, so this binary should cover both.
+      - name: system deps
+        run: sudo apt-get update && sudo apt-get install -y python3-tk python3-venv xvfb
+
+      - name: fetch hd2-audio-modder
+        run: |
+          git clone https://github.com/RaidingForPants/hd2-audio-modder.git tools/hd2-audio-modder
+          git -C tools/hd2-audio-modder checkout c408a44
+
+      - run: |
+          python3 -m venv .venv
+          .venv/bin/pip install numpy lz4 pyinstaller
+
+      - name: flatten hd2-audio-modder next to the entry script
+        run: |
+          cp tools/hd2-audio-modder/*.py .
+          cp -r tools/hd2-audio-modder/backend backend
+
+      - name: build binary
+        run: >
+          .venv/bin/pyinstaller --onefile
+          --name HelldiversInternational-Randomizer
+          --add-data "voice_map.json:."
+          --add-data "voice_crosswalk.json:."
+          --add-data "grunt_packs.json:."
+          randomizer_gui.py
+
+      - name: smoke test (window must open and stay up, under Xvfb)
+        run: |
+          xvfb-run -a ./dist/HelldiversInternational-Randomizer &
+          pid=$!
+          sleep 5
+          if ! kill -0 $pid 2>/dev/null; then
+            echo "exited early"
+            cat dist/randomizer_crash.log 2>/dev/null
+            exit 1
+          fi
+          kill $pid
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HelldiversInternational-Randomizer-linux
+          path: dist/HelldiversInternational-Randomizer
