@@ -731,7 +731,9 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.configure(bg=BG)
-        self.resizable(False, False)
+        self.geometry("660x680")
+        self.minsize(520, 420)
+        self.resizable(True, True)
         self.cfg = load_config()
         self._init_style()
         self._init_vars()
@@ -749,8 +751,29 @@ class App(tk.Tk):
         self.ui_lang_combo.pack(side="right")
         self.ui_lang_combo.bind("<<ComboboxSelected>>", self.on_ui_lang_change)
 
+        # Las opciones ocupan una region desplazable; las acciones principales
+        # quedan fijas abajo para que Randomize siempre este disponible.
         self.content = tk.Frame(self, bg=BG)
         self.content.pack(fill="both", expand=True)
+        self.content.grid_rowconfigure(0, weight=1)
+        self.content.grid_columnconfigure(0, weight=1)
+        self.canvas = tk.Canvas(self.content, bg=BG, highlightthickness=0, bd=0)
+        self.canvas.grid(row=0, column=0, sticky="nsew")
+        self.scrollbar = ttk.Scrollbar(self.content, orient="vertical",
+                                       command=self.canvas.yview)
+        self.scrollbar.grid(row=0, column=1, sticky="ns")
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+        self.options_frame = tk.Frame(self.canvas, bg=BG)
+        self.canvas_window = self.canvas.create_window(
+            (0, 0), window=self.options_frame, anchor="nw")
+        self.options_frame.bind("<Configure>", self._update_scroll_region)
+        self.canvas.bind("<Configure>", self._resize_options_frame)
+        self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
+        self.canvas.bind_all("<Button-4>", self._on_mousewheel)
+        self.canvas.bind_all("<Button-5>", self._on_mousewheel)
+
+        self.footer = tk.Frame(self, bg=BG)
+        self.footer.pack(fill="x", padx=16, pady=(4, 10))
         self._build_content()
 
         self.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -788,17 +811,36 @@ class App(tk.Tk):
         self.ui_lang = code
         self.cfg["ui_lang"] = code
         save_config(self.cfg)
-        for child in self.content.winfo_children():
+        for child in self.options_frame.winfo_children():
+            child.destroy()
+        for child in self.footer.winfo_children():
             child.destroy()
         self._build_content()
+        self.canvas.yview_moveto(0)
+
+    def _update_scroll_region(self, event=None):
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    def _resize_options_frame(self, event):
+        self.canvas.itemconfigure(self.canvas_window, width=event.width)
+
+    def _on_mousewheel(self, event):
+        # Tk usa delta en Windows/macOS y botones 4/5 en Linux.
+        if event.num == 4:
+            step = -1
+        elif event.num == 5:
+            step = 1
+        else:
+            step = -1 if event.delta > 0 else 1
+        self.canvas.yview_scroll(step * 3, "units")
 
     def _build_content(self):
         S = self.S
         self.title(f"Helldivers International - {S('subtitle')}")
         self.ui_lang_label.configure(text=S("ui_lang_label") + ":")
 
-        outer = {"padx": 16, "pady": 10}
-        c = self.content
+        outer = {"padx": 12, "pady": 6}
+        c = self.options_frame
 
         header = tk.Frame(c, bg=BG)
         header.pack(fill="x")
@@ -812,7 +854,7 @@ class App(tk.Tk):
         c0.pack(fill="x", **outer)
         row0 = tk.Frame(c0.body, bg=PANEL)
         row0.pack(fill="x")
-        tk.Entry(row0, textvariable=self.mod_dir_var, width=46, state="readonly",
+        tk.Entry(row0, textvariable=self.mod_dir_var, width=32, state="readonly",
                   bg=FIELD, fg=FG, readonlybackground=FIELD,
                   insertbackground=FG, relief="flat").pack(side="left", fill="x", expand=True,
                                                               ipady=3)
@@ -824,7 +866,7 @@ class App(tk.Tk):
         c1.pack(fill="x", **outer)
         row = tk.Frame(c1.body, bg=PANEL)
         row.pack(fill="x")
-        tk.Entry(row, textvariable=self.dir_var, width=46, state="readonly",
+        tk.Entry(row, textvariable=self.dir_var, width=32, state="readonly",
                   bg=FIELD, fg=FG, readonlybackground=FIELD,
                   insertbackground=FG, relief="flat").pack(side="left", fill="x", expand=True,
                                                              ipady=3)
@@ -853,7 +895,7 @@ class App(tk.Tk):
             display_var = tk.StringVar(value=mode_label_by_code[self.mode_vars[short].get()])
             cb = ttk.Combobox(row, textvariable=display_var,
                                 values=list(mode_label_by_code.values()),
-                                state="readonly", width=28, style="Dark.TCombobox")
+                                state="readonly", width=20, style="Dark.TCombobox")
             cb.pack(side="left")
 
             def on_pick(e, short=short, display_var=display_var, code_map=code_by_mode_label):
@@ -877,8 +919,8 @@ class App(tk.Tk):
                         ).pack(side="left", padx=(0, 16))
 
         # -- botones principales --
-        f3 = tk.Frame(c, bg=BG)
-        f3.pack(fill="x", padx=16, pady=(4, 8))
+        f3 = tk.Frame(self.footer, bg=BG)
+        f3.pack(fill="x", pady=(0, 6))
         self.randomize_btn = self._button(f3, f"\u2604  {S('btn_randomize')}",
                                             self.on_randomize, primary=True)
         self.randomize_btn.pack(side="left", fill="x", expand=True, ipady=4)
@@ -891,10 +933,10 @@ class App(tk.Tk):
 
         # -- log --
         self.log_widget = scrolledtext.ScrolledText(
-            c, width=60, height=7, state="disabled", bg=FIELD, fg=MUTED,
+            self.footer, width=60, height=3, state="disabled", bg=FIELD, fg=MUTED,
             insertbackground=FG, relief="flat", font=("Consolas", 9),
             borderwidth=0, highlightbackground=BORDER, highlightthickness=1)
-        self.log_widget.pack(fill="both", expand=True, padx=16, pady=(0, 16))
+        self.log_widget.pack(fill="x")
 
     # -- estilo ttk (Combobox no se puede pintar con tk.Button directamente) --
     def _init_style(self):
