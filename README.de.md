@@ -28,6 +28,6 @@ Die EXE wird aus dem Python-Quellcode dieses Repositorys mit GitHub Actions erst
 
 GitHub Actions verwendet Python 3.12 und PyInstaller. Der Audio-Parser wird am festgelegten Commit **c408a44** geladen. Spielaudio wird nicht mitgeliefert.
 
-**SHA-256:** A3005AADDF57AE3EE7208DCDFDDBEBC4030D5C5C415C296132A03B1E6D094D62
+**SHA-256:** 911B24B4A0A2F2F335FB14A603C9D9861DF8E963ECB606FE86BBE92FD992EAAA
 
-[Quellcode](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [Build-Workflow](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [Erfolgreicher Windows-Build](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36000112609)
+[Quellcode](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [Build-Workflow](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [Erfolgreicher Windows-Build](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36005520789)

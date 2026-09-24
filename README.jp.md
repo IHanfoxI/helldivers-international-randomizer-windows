@@ -28,6 +28,6 @@ Arsenal でメインMODを再配置または更新した場合は、その後に
 
 GitHub Actions は Python 3.12 と PyInstaller を使用します。音声パーサーは固定コミット **c408a44** から取得し、ゲームデータは同梱しません。
 
-**SHA-256:** A3005AADDF57AE3EE7208DCDFDDBEBC4030D5C5C415C296132A03B1E6D094D62
+**SHA-256:** 911B24B4A0A2F2F335FB14A603C9D9861DF8E963ECB606FE86BBE92FD992EAAA
 
-[ソースコード](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [ビルドワークフロー](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [成功した Windows ビルド](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36000112609)
+[ソースコード](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [ビルドワークフロー](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [成功した Windows ビルド](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36005520789)
