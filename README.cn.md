@@ -9,6 +9,8 @@
 
 ## 🎮 功能
 
+> **必需模组：** 本工具不能独立运行。请先从 [Nexus Mods 下载并安装 Helldivers International](https://www.nexusmods.com/helldivers2/mods/14183)。九种游戏内语言请使用主文件；需要俄语或韩语语音时，请使用同一页面上的 **Fandubs** 文件。请选择已安装的模组文件夹；如果不使用 Arsenal，请先解压下载的压缩包。Randomizer 不包含模组或音频。
+
 为四个 Helldiver 语音槽随机分配语音类型和语言，并将 patch 文件写入 Helldivers 2 的 data 文件夹。支持游戏内九种语言；若所选模组包含俄语和韩语同人配音，也可以使用。
 
 ## 🚀 安装与使用

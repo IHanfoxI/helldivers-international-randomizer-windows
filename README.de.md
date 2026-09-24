@@ -9,6 +9,8 @@
 
 ## 🎮 Funktionen
 
+> **Erforderliche Mod:** Diese Begleit-App funktioniert nicht allein. Lade zuerst [Helldivers International von Nexus Mods](https://www.nexusmods.com/helldivers2/mods/14183) herunter und installiere es. Für die neun Spielsprachen brauchst du die Hauptdatei; für russische oder koreanische Stimmen die Datei **Fandubs** auf derselben Seite. Wähle den installierten Modordner aus oder entpacke das Archiv zuerst, wenn du Arsenal nicht verwendest. Mod und Audiodateien sind nicht enthalten.
+
 Das Tool lost Stimmtyp und Sprache für alle vier Helldiver-Stimmenplätze aus und schreibt Patch-Dateien in den Datenordner von Helldivers 2. Es unterstützt die neun Spielsprachen sowie russische und koreanische Fandubs, sofern sie in der ausgewählten Mod enthalten sind.
 
 ## 🚀 Installation und Nutzung

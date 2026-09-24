@@ -9,6 +9,8 @@
 
 ## 🎮 Qué hace
 
+> **Mod necesario:** Esta aplicación complementaria no funciona por sí sola. Primero descarga e instala [Helldivers International desde Nexus Mods](https://www.nexusmods.com/helldivers2/mods/14183). Usa el archivo principal para los nueve idiomas del juego y el **Fandubs** de esa página para las voces rusa o coreana. Selecciona la carpeta del mod instalado; si no usas Arsenal, extrae primero el archivo descargado. El Randomizer no incluye el mod ni su audio.
+
 Asigna al azar tipo de voz e idioma a los cuatro espacios de Helldiver y escribe archivos patch en la carpeta de datos de Helldivers 2. Admite los nueve idiomas del juego y, cuando están incluidos en el mod, los fandubs ruso y coreano.
 
 ## 🚀 Instalar y usar
