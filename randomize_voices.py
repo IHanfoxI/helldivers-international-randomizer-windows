@@ -23,7 +23,7 @@ eligiendo N mas alto que cualquier patch_N ya presente (para no pisar lo que
 puso Arsenal). Correr de nuevo para una mezcla distinta. Si Arsenal reinstala
 o actualiza el mod principal, vuelve a correr esto despues (pisa lo nuestro).
 """
-import argparse, glob, os, random, re, sys, types
+import argparse, glob, json, os, random, re, sys, types
 
 # frozen (PyInstaller): data files ship next to the exe in _MEIPASS instead of
 # alongside this .py source.
@@ -84,6 +84,44 @@ def next_patch_num(game_dir):
     nums = [int(m.group(1)) for f in glob.glob(os.path.join(game_dir, f"{PATCH_STEM}.patch_*"))
             if (m := re.fullmatch(rf"{PATCH_STEM}\.patch_(\d+)", os.path.basename(f)))]
     return max(nums, default=-1) + 1
+
+
+LEDGER = "helldivers_intl_randomizer.json"
+
+
+def _stamp(path):
+    st = os.stat(path)
+    return [st.st_size, st.st_mtime_ns]
+
+
+def remove_own_patches(out_dir, log=print):
+    """Borra los patches que escribio una corrida anterior del randomizer.
+    Sin esto se apilan (patch_56..63) y un slot que en esta corrida sale de su
+    mismo tipo no trae grunidos, asi que los de un cruce viejo seguian
+    ganando. Solo borra un archivo si calza tamano+mtime con lo anotado: un
+    Deploy de Arsenal reescribe desde patch_0 y puede reusar ese numero para
+    SU patch, que no hay que tocar."""
+    path = os.path.join(out_dir, LEDGER)
+    try:
+        ledger = json.load(open(path))
+    except (OSError, ValueError):
+        return
+    for name, stamp in ledger.items():
+        f = os.path.join(out_dir, name)
+        try:
+            if _stamp(f) == stamp:
+                os.remove(f)
+                log(f"  borrado patch anterior: {name}")
+        except OSError:
+            pass
+    os.remove(path)
+
+
+def remember_patch(out_dir, patch_name):
+    names = [patch_name, patch_name + ".stream"]
+    ledger = {n: _stamp(os.path.join(out_dir, n)) for n in names
+              if os.path.exists(os.path.join(out_dir, n))}
+    json.dump(ledger, open(os.path.join(out_dir, LEDGER), "w"))
 
 
 def combo_patch_path(mod_dir, target_voice, src_voice, lang):
@@ -209,6 +247,7 @@ def run_randomize(mod_dir, game_dir, out_dir=None, excluded_langs=(), seed=None,
     if not modified_streams:
         raise ValueError("nada que escribir (revisa las carpetas elegidas)")
 
+    remove_own_patches(out_dir, log)
     patch = bm.core.GameArchive()
     num = next_patch_num(out_dir)
     patch.name = f"{PATCH_STEM}.patch_{num}"
@@ -221,6 +260,7 @@ def run_randomize(mod_dir, game_dir, out_dir=None, excluded_langs=(), seed=None,
     patch.text_banks = {}
     patch.video_sources = {}
     bm.write_stream_patch(patch, out_dir)
+    remember_patch(out_dir, patch.name)
     log(f"listo: {patch.name}(+.stream) en {out_dir}")
     return picks
 
