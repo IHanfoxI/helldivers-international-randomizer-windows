@@ -673,7 +673,8 @@ I18N_NPC = {
                 "Each character (Eagle-1, Pelican-1, ship crew...) gets a random language.",
     "mission_title": "Mission Voices",
     "mission_sub": "Optional. Folder where you unzipped \"Helldivers International - Mission\". "
-                   "SEAF troopers and civilians each get a random language.",
+                   "Each SEAF role (leader, medic, specialist, trooper; men and women apart) and "
+                   "civilian men and women get their own random language.",
     "btn_randomize_all": "RANDOMIZE ALL", "only_label": "Only:", "btn_clear": "Clear",
     "err_no_mods": "Choose at least one mod folder (main, Ship & Air or Mission).",
     "err_kind_wrong": "That folder isn't the \"{name}\" mod. Choose the folder where you "
@@ -686,7 +687,8 @@ I18N_NPC = {
                 "Cada personaje (Águila-1, Pelícano-1, tripulación...) recibe un idioma al azar.",
     "mission_title": "Voces de Misión",
     "mission_sub": "Opcional. Carpeta donde descomprimiste \"Helldivers International - Mission\". "
-                   "Los soldados SEAF y los civiles reciben cada uno un idioma al azar.",
+                   "Cada rol SEAF (líder, médico, especialista, soldado; hombres y mujeres "
+                   "aparte) y los civiles hombres y mujeres reciben su propio idioma al azar.",
     "btn_randomize_all": "RANDOMIZAR TODO", "only_label": "Solo:", "btn_clear": "Quitar",
     "err_no_mods": "Elige al menos una carpeta de mod (principal, Nave y Aire o Misión).",
     "err_kind_wrong": "Esa carpeta no es el mod \"{name}\". Elige la carpeta donde lo "
@@ -698,8 +700,8 @@ I18N_NPC = {
     "ship_sub": "任意。「Helldivers International - ShipAir」を解凍したフォルダ。各キャラクター"
                 "（イーグル1、ペリカン1、乗組員など）にランダムな言語が割り当てられます。",
     "mission_title": "ミッションボイス",
-    "mission_sub": "任意。「Helldivers International - Mission」を解凍したフォルダ。SEAF兵と"
-                   "民間人にそれぞれランダムな言語が割り当てられます。",
+    "mission_sub": "任意。「Helldivers International - Mission」を解凍したフォルダ。SEAF兵の役割"
+                   "（分隊長・衛生兵・特技兵・兵士、男女別）と民間人の男女に、それぞれランダムな言語が割り当てられます。",
     "btn_randomize_all": "すべてランダマイズ", "only_label": "個別：", "btn_clear": "解除",
     "err_no_mods": "MODフォルダを少なくとも1つ選んでください（メイン、艦艇・航空、ミッション）。",
     "err_kind_wrong": "そのフォルダは「{name}」MODではありません。解凍したフォルダを選んでください。",
@@ -712,7 +714,8 @@ I18N_NPC = {
                 "Sprache.",
     "mission_title": "Missionsstimmen",
     "mission_sub": "Optional. Ordner, in den du \"Helldivers International - Mission\" entpackt "
-                   "hast. SEAF-Soldaten und Zivilisten bekommen je eine zufällige Sprache.",
+                   "hast. Jede SEAF-Rolle (Truppführer, Sanitäter, Spezialist, Soldat; Männer und "
+                   "Frauen getrennt) und Zivilisten und Zivilistinnen bekommen je eine zufällige Sprache.",
     "btn_randomize_all": "ALLES WÜRFELN", "only_label": "Nur:", "btn_clear": "Entfernen",
     "err_no_mods": "Wähle mindestens einen Mod-Ordner (Haupt, Schiff & Luft oder Mission).",
     "err_kind_wrong": "Dieser Ordner ist nicht der Mod \"{name}\". Wähle den Ordner, in den du "
@@ -726,8 +729,8 @@ I18N_NPC = {
                 "langue au hasard.",
     "mission_title": "Voix de mission",
     "mission_sub": "Facultatif. Dossier où tu as décompressé « Helldivers International - "
-                   "Mission ». Les soldats SEAF et les civils reçoivent chacun une langue au "
-                   "hasard.",
+                   "Mission ». Chaque rôle SEAF (chef, médecin, spécialiste, soldat ; hommes et "
+                   "femmes à part) et les civils, hommes et femmes, reçoivent chacun une langue au hasard.",
     "btn_randomize_all": "TOUT RANDOMISER", "only_label": "Seulement :", "btn_clear": "Retirer",
     "err_no_mods": "Choisis au moins un dossier de mod (principal, Vaisseau & Aérien ou Mission).",
     "err_kind_wrong": "Ce dossier n'est pas le mod « {name} ». Choisis le dossier où tu l'as "
@@ -740,7 +743,8 @@ I18N_NPC = {
                 "Ogni personaggio (Eagle-1, Pelican-1, equipaggio...) riceve una lingua a caso.",
     "mission_title": "Voci di missione",
     "mission_sub": "Facoltativo. Cartella dove hai estratto \"Helldivers International - "
-                   "Mission\". I soldati SEAF e i civili ricevono ciascuno una lingua a caso.",
+                   "Mission\". Ogni ruolo SEAF (caposquadra, medico, specialista, soldato; uomini e "
+                   "donne a parte) e i civili, uomini e donne, ricevono ciascuno una lingua a caso.",
     "btn_randomize_all": "RANDOMIZZA TUTTO", "only_label": "Solo:", "btn_clear": "Rimuovi",
     "err_no_mods": "Scegli almeno una cartella di mod (principale, Nave & Aria o Missione).",
     "err_kind_wrong": "Quella cartella non è la mod \"{name}\". Scegli la cartella dove l'hai "
@@ -753,7 +757,8 @@ I18N_NPC = {
                 "Cada personagem (Eagle-1, Pelican-1, tripulação...) recebe um idioma aleatório.",
     "mission_title": "Vozes de Missão",
     "mission_sub": "Opcional. Pasta onde você descompactou \"Helldivers International - "
-                   "Mission\". Os soldados SEAF e os civis recebem cada um um idioma aleatório.",
+                   "Mission\". Cada função SEAF (líder, médico, especialista, soldado; homens e "
+                   "mulheres à parte) e os civis, homens e mulheres, recebem cada um um idioma aleatório.",
     "btn_randomize_all": "RANDOMIZAR TUDO", "only_label": "Só:", "btn_clear": "Remover",
     "err_no_mods": "Escolha pelo menos uma pasta de mod (principal, Nave e Aéreas ou Missão).",
     "err_kind_wrong": "Essa pasta não é o mod \"{name}\". Escolha a pasta onde você o "
@@ -765,8 +770,8 @@ I18N_NPC = {
     "ship_sub": "可选。解压「Helldivers International - ShipAir」的文件夹。每个角色（鹰-1、"
                 "鹈鹕-1、舰上人员等）会随机分配一种语言。",
     "mission_title": "任务语音",
-    "mission_sub": "可选。解压「Helldivers International - Mission」的文件夹。SEAF士兵和平民"
-                   "各自随机分配一种语言。",
+    "mission_sub": "可选。解压「Helldivers International - Mission」的文件夹。SEAF的每种职责"
+                   "（班长、医疗兵、专家、士兵，男女分开）以及男女平民各自随机分配一种语言。",
     "btn_randomize_all": "全部随机分配", "only_label": "仅：", "btn_clear": "移除",
     "err_no_mods": "请至少选择一个MOD文件夹（主MOD、舰船与空中或任务）。",
     "err_kind_wrong": "该文件夹不是「{name}」MOD。请选择解压它的文件夹。",
@@ -779,7 +784,8 @@ I18N_NPC = {
                 "язык.",
     "mission_title": "Голоса миссий",
     "mission_sub": "Необязательно. Папка, куда вы распаковали «Helldivers International - "
-                   "Mission». Солдаты SEAF и гражданские получают каждый случайный язык.",
+                   "Mission». Каждая роль SEAF (командир, медик, специалист, солдат; мужчины и "
+                   "женщины отдельно) и гражданские мужчины и женщины получают свой случайный язык.",
     "btn_randomize_all": "РАНДОМИЗИРОВАТЬ ВСЁ", "only_label": "Только:", "btn_clear": "Убрать",
     "err_no_mods": "Выберите хотя бы одну папку мода (основной, корабль и авиация или миссии).",
     "err_kind_wrong": "Эта папка — не мод «{name}». Выберите папку, куда вы его распаковали.",
@@ -790,8 +796,8 @@ I18N_NPC = {
     "ship_sub": "선택 사항. \"Helldivers International - ShipAir\"의 압축을 푼 폴더. 각 캐릭터"
                 "(이글-1, 펠리컨-1, 승무원 등)에 무작위 언어가 지정됩니다.",
     "mission_title": "임무 음성",
-    "mission_sub": "선택 사항. \"Helldivers International - Mission\"의 압축을 푼 폴더. SEAF "
-                   "병사와 민간인에게 각각 무작위 언어가 지정됩니다.",
+    "mission_sub": "선택 사항. \"Helldivers International - Mission\"의 압축을 푼 폴더. SEAF 역할"
+                   "(분대장, 의무병, 특기병, 병사, 남녀 별도)과 민간인 남녀에게 각각 무작위 언어가 지정됩니다.",
     "btn_randomize_all": "모두 랜덤화", "only_label": "개별:", "btn_clear": "제거",
     "err_no_mods": "모드 폴더를 하나 이상 선택하세요(메인, 함선 및 항공, 임무).",
     "err_kind_wrong": "이 폴더는 \"{name}\" 모드가 아닙니다. 압축을 푼 폴더를 선택하세요.",
@@ -843,12 +849,55 @@ NPC_NAMES = {
 }
 NPC_NAMES["ms"] = NPC_NAMES["es"]
 
+# Mission va por actor: seaf_<rol>_<m|f>, civilian_<m|f> (build_npc.SLOT_ACTOR).
+# Copia de build_npc.ROLE_TEXT/GENDER_TEXT; ru/ko traducidos a mano.
+NPC_ROLE = {
+    "us": {"leader": "Squad leader", "medic": "Medic", "specialist": "Specialist",
+           "trooper": "Trooper"},
+    "es": {"leader": "Líder de escuadra", "medic": "Médico", "specialist": "Especialista",
+           "trooper": "Soldado"},
+    "jp": {"leader": "分隊長", "medic": "衛生兵", "specialist": "特技兵", "trooper": "兵士"},
+    "de": {"leader": "Truppführer", "medic": "Sanitäter", "specialist": "Spezialist",
+           "trooper": "Soldat"},
+    "fr": {"leader": "Chef d'escouade", "medic": "Médecin", "specialist": "Spécialiste",
+           "trooper": "Soldat"},
+    "it": {"leader": "Caposquadra", "medic": "Medico", "specialist": "Specialista",
+           "trooper": "Soldato"},
+    "bp": {"leader": "Líder de esquadrão", "medic": "Médico", "specialist": "Especialista",
+           "trooper": "Soldado"},
+    "cn": {"leader": "班长", "medic": "医疗兵", "specialist": "专家", "trooper": "士兵"},
+    "ru": {"leader": "Командир отделения", "medic": "Медик", "specialist": "Специалист",
+           "trooper": "Солдат"},
+    "ko": {"leader": "분대장", "medic": "의무병", "specialist": "특기병", "trooper": "병사"},
+}
+NPC_GENDER = {
+    "us": {"m": "male", "f": "female"}, "es": {"m": "hombre", "f": "mujer"},
+    "jp": {"m": "男性", "f": "女性"}, "de": {"m": "Mann", "f": "Frau"},
+    "fr": {"m": "homme", "f": "femme"}, "it": {"m": "uomo", "f": "donna"},
+    "bp": {"m": "homem", "f": "mulher"}, "cn": {"m": "男", "f": "女"},
+    "ru": {"m": "мужчина", "f": "женщина"}, "ko": {"m": "남성", "f": "여성"},
+}
+NPC_ROLE["ms"] = NPC_ROLE["es"]
+NPC_GENDER["ms"] = NPC_GENDER["es"]
+
+
+def npc_display(ui_lang, slot):
+    names = NPC_NAMES.get(ui_lang, NPC_NAMES["us"])
+    parts = slot.split("_")
+    if parts[0] in ("seaf", "civilian") and parts[-1] in ("m", "f"):
+        g = NPC_GENDER.get(ui_lang, NPC_GENDER["us"])[parts[-1]]
+        if parts[0] == "seaf" and len(parts) == 3:
+            role = NPC_ROLE.get(ui_lang, NPC_ROLE["us"]).get(parts[1], parts[1])
+            return f"SEAF {role} ({g})"
+        return f"{names['civilian']} ({g})"
+    return names.get(slot, slot)
+
 VOICE_MODE_CODES = ["own", "gender", "any"]
 
 # tipos de mod: carpeta que lo delata, clave de config, titulo en I18N, color.
 # = randomize_voices.KIND_MARKER, copiado: importarlo arrastra numpy/lz4/core.
 KINDS = ["helldiver", "ship", "mission"]
-KIND_MARKER = {"helldiver": "female1", "ship": "eagle", "mission": "seaf"}
+KIND_MARKER = {"helldiver": "female1", "ship": "eagle", "mission": "civilian_f"}
 KIND_CFG = {"helldiver": "mod_dir", "ship": "ship_dir", "mission": "mission_dir"}
 KIND_TITLE = {"helldiver": "mod_title", "ship": "ship_title", "mission": "mission_title"}
 KIND_SUB = {"helldiver": "mod_sub", "ship": "ship_sub", "mission": "mission_sub"}
@@ -1270,7 +1319,6 @@ class App(ctk.CTk):
         S = self.S
         self._end_busy()
         names = LANG_NAMES.get(self.ui_lang, LANG_NAMES["us"])
-        npc_names = NPC_NAMES.get(self.ui_lang, NPC_NAMES["us"])
         for kind in KINDS:
             for pick in results.get(kind, []):
                 if kind == "helldiver":
@@ -1278,7 +1326,7 @@ class App(ctk.CTk):
                     self.log(f"{voice_display(self.ui_lang, t)} \u2192 "
                              f"{voice_display(self.ui_lang, s)} \u00b7 {names.get(lang, lang)}")
                 else:
-                    self.log(f"{npc_names.get(pick[0], pick[0])} \u2192 "
+                    self.log(f"{npc_display(self.ui_lang, pick[0])} \u2192 "
                              f"{names.get(pick[1], pick[1])}")
         self.log(S("log_done"))
 
@@ -1305,7 +1353,7 @@ class App(ctk.CTk):
                     who, voice = voice_display(self.ui_lang, t), voice_display(self.ui_lang, s)
                 else:
                     slot, lang = pick
-                    who, voice = npc_names.get(slot, slot), None
+                    who, voice = npc_display(self.ui_lang, slot), None
                 row = ctk.CTkFrame(body, fg_color=PANEL, corner_radius=10, border_width=1,
                                    border_color=BORDER)
                 row.pack(fill="x", pady=3, padx=4)

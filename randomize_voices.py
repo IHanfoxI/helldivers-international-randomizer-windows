@@ -96,7 +96,7 @@ LEDGER = "helldivers_intl_randomizer.json"
 PATCH0 = f"{PATCH_STEM}.patch_0"
 KINDS = ("helldiver", "ship", "mission")
 # carpeta que delata cada tipo de mod descomprimido (ver mod_kind)
-KIND_MARKER = {"helldiver": "female1", "ship": "eagle", "mission": "seaf"}
+KIND_MARKER = {"helldiver": "female1", "ship": "eagle", "mission": "civilian_f"}
 
 
 def _stamp(path):
@@ -253,8 +253,9 @@ def pick_helldiver(mod_dir, rng, excluded_langs=(), log=print, fandub_langs=(),
 def npc_slots(mod_dir):
     """{slot: [idiomas con patch]} de un mod Ship & Air o Mission ya
     descomprimido (`<slot>/<lang>/<hash>.patch_0`, ver build_npc.gen_patches).
-    La opcion "random" de Mission (mezcla por linea) queda fuera: aca el
-    idioma lo sortea el randomizer."""
+    Mission trae un slot por actor (seaf_<rol>_<m|f>, civilian_<m|f>), asi
+    que cada rol y genero sale con su propio idioma. "random" es la mezcla por
+    linea de builds viejos: queda fuera, aca el idioma lo sortea el randomizer."""
     out = {}
     for slot in sorted(os.listdir(mod_dir)):
         d = os.path.join(mod_dir, slot)
@@ -282,7 +283,7 @@ def pick_npc(mod_dir, rng, excluded_langs=(), log=print, avoid_repeat_langs=True
         if lang is None:
             continue
         picks.append((slot, lang))
-        log(f"  {slot:12s} <- {lang}")
+        log(f"  {slot:17s} <- {lang}")
         paths.append(os.path.join(mod_dir, slot, lang, PATCH0))
     return picks, paths
 

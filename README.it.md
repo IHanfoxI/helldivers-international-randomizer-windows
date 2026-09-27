@@ -13,7 +13,7 @@
 
 Assegna casualmente tipo di voce e lingua ai quattro slot vocali degli Helldiver e scrive file patch nella cartella dati di Helldivers 2. Supporta le nove lingue del gioco e, se incluse nella mod selezionata, le fandub russa e coreana.
 
-Può anche randomizzare i file **Ship & Air** e **Mission** della stessa pagina: ogni personaggio (Eagle-1, Pelican-1, equipaggio, soldati SEAF, civili) riceve una lingua a caso. Queste due cartelle sono facoltative.
+Può anche randomizzare i file **Ship & Air** e **Mission** della stessa pagina: ogni personaggio (Eagle-1, Pelican-1, equipaggio, soldati SEAF, civili) riceve una lingua a caso. Queste due cartelle sono facoltative. I SEAF ricevono una lingua per ruolo e genere (caposquadra, medico, specialista, soldato) e i civili una per genere; serve il file Mission versione 11 o successiva.
 
 ## 🚀 Installazione e uso
 

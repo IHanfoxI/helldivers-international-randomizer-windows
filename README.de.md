@@ -13,7 +13,7 @@
 
 Das Tool lost Stimmtyp und Sprache für alle vier Helldiver-Stimmenplätze aus und schreibt Patch-Dateien in den Datenordner von Helldivers 2. Es unterstützt die neun Spielsprachen sowie russische und koreanische Fandubs, sofern sie in der ausgewählten Mod enthalten sind.
 
-Es kann auch die Dateien **Ship & Air** und **Mission** derselben Seite würfeln: Jede Figur (Eagle-1, Pelican-1, Schiffscrew, SEAF-Soldaten, Zivilisten) bekommt eine zufällige Sprache. Diese beiden Ordner sind optional.
+Es kann auch die Dateien **Ship & Air** und **Mission** derselben Seite würfeln: Jede Figur (Eagle-1, Pelican-1, Schiffscrew, SEAF-Soldaten, Zivilisten) bekommt eine zufällige Sprache. Diese beiden Ordner sind optional. SEAF-Soldaten bekommen eine Sprache pro Rolle und Geschlecht (Truppführer, Sanitäter, Spezialist, Soldat), Zivilisten eine pro Geschlecht; dafür braucht es die Mission-Datei ab Version 11.
 
 ## 🚀 Installation und Nutzung
 

@@ -13,7 +13,7 @@
 
 Randomizes voice type and language across the four Helldiver voice slots, then writes patch files into the Helldivers 2 data folder. Supports all nine in-game languages and, when included in the selected mod, Russian and Korean fandubs.
 
-It can also randomize the **Ship & Air** and **Mission** files of the same mod page: each character (Eagle-1, Pelican-1, ship crew, SEAF troopers, civilians) gets a random language. Those two folders are optional.
+It can also randomize the **Ship & Air** and **Mission** files of the same mod page: each character (Eagle-1, Pelican-1, ship crew, SEAF troopers, civilians) gets a random language. Those two folders are optional. SEAF troopers get a language per role and gender (squad leader, medic, specialist, trooper) and civilians one per gender; that needs the Mission file version 11 or newer.
 
 ## 🚀 Install and use
 
