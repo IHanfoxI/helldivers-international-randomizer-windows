@@ -14,7 +14,7 @@ en I18N por idioma de interfaz -- copiados de build_mod.STRINGS a mano en
 vez de importar build_mod (import pesado: numpy/lz4/core, se difiere al
 primer click de Randomizar para no romper el arranque de la ventana).
 """
-import json, os, sys, threading, tkinter as tk
+import json, os, queue, sys, threading, tkinter as tk
 from tkinter import filedialog, messagebox
 
 import customtkinter as ctk
@@ -966,7 +966,29 @@ class App(ctk.CTk):
         self.footer.pack(fill="x", padx=22, pady=(8, 14))
         self._build_content()
 
+        # el hilo del sorteo no toca tk: deja ("log"|"done"|"error", dato) aca
+        # y _poll lo procesa desde el hilo principal. after() llamado desde
+        # otro hilo no siempre llega (probado: la ventana quedaba "ocupada").
+        self.events = queue.Queue()
+        self._poll()
         self.protocol("WM_DELETE_WINDOW", self.on_close)
+
+    def _poll(self):
+        while True:
+            try:
+                kind, data = self.events.get_nowait()
+            except queue.Empty:
+                break
+            if kind == "log":
+                self._append_log(data)
+            elif kind == "done":
+                self._on_randomize_done(data)
+            else:
+                self._append_log(f"\u26a0 {data}")
+                messagebox.showerror(self.S("err_failed_title"),
+                                     self.S("err_failed_body").format(e=data))
+                self._end_busy()
+        self.after(100, self._poll)
 
     def S(self, key):
         return I18N.get(self.ui_lang, I18N["us"]).get(key, I18N["us"][key])
@@ -1143,8 +1165,7 @@ class App(ctk.CTk):
             b.configure(state=idle if have[kind] else "disabled")
 
     def log(self, msg):
-        # se llama desde el hilo del sorteo: tk solo se toca desde el principal
-        self.after(0, self._append_log, str(msg))
+        self.events.put(("log", str(msg)))
 
     def _append_log(self, msg):
         self.log_widget.configure(state="normal")
@@ -1236,14 +1257,9 @@ class App(ctk.CTk):
     def _randomize_worker(self, game_dir, mod_dirs, kw):
         try:
             import randomize_voices as rv  # pesado (numpy/lz4/core) -- diferido al primer uso
-            results = rv.run_all(game_dir, mod_dirs, **kw)
-            self.after(0, self._on_randomize_done, results)
+            self.events.put(("done", rv.run_all(game_dir, mod_dirs, **kw)))
         except Exception as e:
-            self.log(f"\u26a0 {e}")
-            S = self.S
-            self.after(0, lambda: messagebox.showerror(
-                S("err_failed_title"), S("err_failed_body").format(e=e)))
-            self.after(0, self._end_busy)
+            self.events.put(("error", e))
 
     def _end_busy(self):
         self.busy = False
