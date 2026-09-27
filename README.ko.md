@@ -30,6 +30,6 @@ Arsenal에서 메인 모드를 다시 배포하거나 업데이트했다면 Rand
 
 빌드는 Python 3.12와 PyInstaller를 사용합니다. 오디오 파서는 공개 저장소의 고정 커밋 **c408a44**에서 가져옵니다. 게임 파일은 포함되지 않습니다.
 
-**SHA-256:** A5E367324579AED85B7FA71ACD74F1FA08DAD84F7EF96850F478DC5E024FBE7E
+**SHA-256:** 383D39113C261555AD412F06D26C8F9C6F795FB662CDCABF8444AC8F55626A70
 
-[소스 코드](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [빌드 workflow](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [성공한 Windows 빌드](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36282140943)
+[소스 코드](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [빌드 workflow](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [성공한 Windows 빌드](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36292827602)

@@ -30,6 +30,6 @@
 
 构建使用 Python 3.12 和 PyInstaller。音频解析器来自固定提交 **c408a44**。不包含游戏文件。
 
-**SHA-256:** A5E367324579AED85B7FA71ACD74F1FA08DAD84F7EF96850F478DC5E024FBE7E
+**SHA-256:** 383D39113C261555AD412F06D26C8F9C6F795FB662CDCABF8444AC8F55626A70
 
-[源代码](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [构建工作流](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [成功的 Windows 构建](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36282140943)
+[源代码](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [构建工作流](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [成功的 Windows 构建](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36292827602)

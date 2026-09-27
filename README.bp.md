@@ -30,6 +30,6 @@ O executável é compilado do código Python deste repositório pelo GitHub Acti
 
 O build usa Python 3.12 e PyInstaller. O parser de áudio é obtido no commit fixado **c408a44**. Nenhum arquivo do jogo é incluído.
 
-**SHA-256:** A5E367324579AED85B7FA71ACD74F1FA08DAD84F7EF96850F478DC5E024FBE7E
+**SHA-256:** 383D39113C261555AD412F06D26C8F9C6F795FB662CDCABF8444AC8F55626A70
 
-[Código-fonte](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [Workflow de build](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [Build do Windows concluído](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36282140943)
+[Código-fonte](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [Workflow de build](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [Build do Windows concluído](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36292827602)
