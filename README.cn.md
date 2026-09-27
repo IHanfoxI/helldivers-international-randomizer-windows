@@ -13,12 +13,14 @@
 
 为四个 Helldiver 语音槽随机分配语音类型和语言，并将 patch 文件写入 Helldivers 2 的 data 文件夹。支持游戏内九种语言；若所选模组包含俄语和韩语同人配音，也可以使用。
 
+它还可以随机化同一页面上的 **Ship & Air** 和 **Mission** 文件：每个角色（鹰-1、鹈鹕-1、舰上人员、SEAF士兵、平民）都会随机分配一种语言。这两个文件夹是可选的。
+
 ## 🚀 安装与使用
 
 1. 点击上方按钮下载 **HelldiversInternational-Randomizer.exe**。
-2. 选择包含 **manifest.json** 的模组文件夹。
+2. 选择包含 **manifest.json** 的模组文件夹。也可以同时选择 Ship & Air 和 Mission 文件夹。
 3. 选择包含 **bundles.nxa** 的 Helldivers 2 **data** 文件夹。
-4. 设置选项并点击 **Randomize**。
+4. 设置选项并点击 **全部随机分配**，或使用下方按钮只随机化一个模组。其他模组保留上次的结果。
 
 若之后通过 Arsenal 重新部署或更新主模组，请再次运行 Randomizer。
 
@@ -28,6 +30,6 @@
 
 构建使用 Python 3.12 和 PyInstaller。音频解析器来自固定提交 **c408a44**。不包含游戏文件。
 
-**SHA-256:** 911B24B4A0A2F2F335FB14A603C9D9861DF8E963ECB606FE86BBE92FD992EAAA
+**SHA-256:** A5E367324579AED85B7FA71ACD74F1FA08DAD84F7EF96850F478DC5E024FBE7E
 
-[源代码](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [构建工作流](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [成功的 Windows 构建](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36005520789)
+[源代码](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [构建工作流](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [成功的 Windows 构建](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36282140943)

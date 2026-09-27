@@ -13,12 +13,14 @@
 
 Assegna casualmente tipo di voce e lingua ai quattro slot vocali degli Helldiver e scrive file patch nella cartella dati di Helldivers 2. Supporta le nove lingue del gioco e, se incluse nella mod selezionata, le fandub russa e coreana.
 
+Può anche randomizzare i file **Ship & Air** e **Mission** della stessa pagina: ogni personaggio (Eagle-1, Pelican-1, equipaggio, soldati SEAF, civili) riceve una lingua a caso. Queste due cartelle sono facoltative.
+
 ## 🚀 Installazione e uso
 
 1. Scarica **HelldiversInternational-Randomizer.exe** con il pulsante qui sopra.
-2. Seleziona la cartella della mod che contiene **manifest.json**.
+2. Seleziona la cartella della mod che contiene **manifest.json**. Se vuoi, seleziona anche le cartelle di Ship & Air e Mission.
 3. Seleziona la cartella **data** di Helldivers 2 che contiene **bundles.nxa**.
-4. Scegli le opzioni e premi **Randomize**.
+4. Scegli le opzioni e premi **Randomizza tutto**, oppure usa i pulsanti sotto per randomizzare una sola mod. Le altre mantengono il risultato precedente.
 
 Se ridistribuisci o aggiorni la mod principale in Arsenal, esegui di nuovo il Randomizer.
 
@@ -28,6 +30,6 @@ L’eseguibile viene compilato dal codice Python di questo repository con GitHub
 
 GitHub Actions usa Python 3.12 e PyInstaller. Il parser audio è scaricato al commit fissato **c408a44**. Nessun file del gioco è incluso.
 
-**SHA-256:** 911B24B4A0A2F2F335FB14A603C9D9861DF8E963ECB606FE86BBE92FD992EAAA
+**SHA-256:** A5E367324579AED85B7FA71ACD74F1FA08DAD84F7EF96850F478DC5E024FBE7E
 
-[Codice sorgente](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [Workflow di build](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [Build Windows riuscita](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36005520789)
+[Codice sorgente](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [Workflow di build](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [Build Windows riuscita](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36282140943)

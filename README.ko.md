@@ -13,12 +13,14 @@
 
 네 개의 헬다이버 음성 슬롯에 음성 종류와 언어를 무작위로 지정하고 Helldivers 2의 data 폴더에 patch 파일을 씁니다. 게임 내 9개 언어를 지원하며, 선택한 모드에 포함된 경우 러시아어와 한국어 팬더빙도 사용할 수 있습니다.
 
+같은 페이지의 **Ship & Air** 및 **Mission** 파일도 랜덤화할 수 있습니다. 각 캐릭터(이글-1, 펠리컨-1, 승무원, SEAF 병사, 민간인)에 무작위 언어가 지정됩니다. 이 두 폴더는 선택 사항입니다.
+
 ## 🚀 설치 및 사용
 
 1. 위 버튼에서 **HelldiversInternational-Randomizer.exe**를 다운로드합니다.
-2. **manifest.json**이 들어 있는 모드 폴더를 선택합니다.
+2. **manifest.json**이 들어 있는 모드 폴더를 선택합니다. 원하면 Ship & Air와 Mission 폴더도 선택합니다.
 3. **bundles.nxa**가 들어 있는 Helldivers 2 **data** 폴더를 선택합니다.
-4. 옵션을 설정하고 **Randomize**를 누릅니다.
+4. 옵션을 설정하고 **모두 랜덤화**를 누르거나, 아래 버튼으로 모드 하나만 랜덤화합니다. 나머지는 이전 결과를 유지합니다.
 
 Arsenal에서 메인 모드를 다시 배포하거나 업데이트했다면 Randomizer를 다시 실행하세요.
 
@@ -28,6 +30,6 @@ Arsenal에서 메인 모드를 다시 배포하거나 업데이트했다면 Rand
 
 빌드는 Python 3.12와 PyInstaller를 사용합니다. 오디오 파서는 공개 저장소의 고정 커밋 **c408a44**에서 가져옵니다. 게임 파일은 포함되지 않습니다.
 
-**SHA-256:** 911B24B4A0A2F2F335FB14A603C9D9861DF8E963ECB606FE86BBE92FD992EAAA
+**SHA-256:** A5E367324579AED85B7FA71ACD74F1FA08DAD84F7EF96850F478DC5E024FBE7E
 
-[소스 코드](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [빌드 workflow](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [성공한 Windows 빌드](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36005520789)
+[소스 코드](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [빌드 workflow](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [성공한 Windows 빌드](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36282140943)

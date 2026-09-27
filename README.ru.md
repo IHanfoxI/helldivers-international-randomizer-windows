@@ -13,12 +13,14 @@
 
 Программа случайно назначает тип голоса и язык четырём голосовым слотам Хеллдайверов, а затем записывает patch-файлы в папку данных Helldivers 2. Поддерживаются девять игровых языков, а также русская и корейская фан-озвучка, если они есть в выбранной версии мода.
 
+Он также может рандомизировать файлы **Ship & Air** и **Mission** с той же страницы: каждый персонаж (Орёл-1, Пеликан-1, экипаж, солдаты SEAF, гражданские) получает случайный язык. Эти две папки необязательны.
+
 ## 🚀 Установка и запуск
 
 1. Скачайте **HelldiversInternational-Randomizer.exe** кнопкой выше.
-2. Выберите папку мода с файлом **manifest.json**.
+2. Выберите папку мода с файлом **manifest.json**. При желании выберите также папки Ship & Air и Mission.
 3. Выберите папку **data** игры Helldivers 2 с файлом **bundles.nxa**.
-4. Настройте параметры и нажмите **Randomize**.
+4. Настройте параметры и нажмите **Рандомизировать всё** или используйте кнопки ниже, чтобы рандомизировать только один мод. Остальные сохранят прежний результат.
 
 Если вы повторно развернули или обновили основной мод через Arsenal, снова запустите Randomizer.
 
@@ -28,6 +30,6 @@ EXE собран из Python-кода этого репозитория с по�
 
 Сборка использует Python 3.12 и PyInstaller. Парсер аудио загружается из публичного репозитория на закреплённом коммите **c408a44**. Игровых файлов в сборке нет.
 
-**SHA-256:** 911B24B4A0A2F2F335FB14A603C9D9861DF8E963ECB606FE86BBE92FD992EAAA
+**SHA-256:** A5E367324579AED85B7FA71ACD74F1FA08DAD84F7EF96850F478DC5E024FBE7E
 
-[Исходный код](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [Workflow сборки](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [Успешная сборка Windows](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36005520789)
+[Исходный код](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/randomizer_gui.py) · [Workflow сборки](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/blob/main/.github/workflows/build-randomizer.yml) · [Успешная сборка Windows](https://github.com/IHanfoxI/helldivers-international-randomizer-windows/actions/runs/36282140943)
