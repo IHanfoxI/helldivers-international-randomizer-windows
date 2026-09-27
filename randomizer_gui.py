@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-Ventana chica para randomize_voices.py: elegir la carpeta del mod y la del
-juego (se guardan), tildar que idiomas sacar del sorteo, restringir por voz
-que genero puede tocarle a cada slot, sumar fandubs si el mod elegido los
-trae, randomizar, y abrir el juego. Toda la logica real vive en
-randomize_voices.run_randomize; esto es solo la interfaz.
+Ventana para randomize_voices.py: elegir las carpetas de los mods (principal,
+Ship & Air, Mission; basta con una) y la del juego (se guardan), tildar que
+idiomas sacar del sorteo, restringir por voz que genero puede tocarle a cada
+slot Helldiver, sumar fandubs si el mod elegido los trae, randomizar todo o un
+mod suelto, y abrir el juego. Toda la logica real vive en
+randomize_voices.run_all; esto es solo la interfaz (CustomTkinter).
 
 Interfaz localizada a 11 idiomas (los 9 del juego + ruso/coreano de
 fandub), default ingles, se recuerda el ultimo elegido. Los nombres de
@@ -14,7 +15,9 @@ vez de importar build_mod (import pesado: numpy/lz4/core, se difiere al
 primer click de Randomizar para no romper el arranque de la ventana).
 """
 import json, os, sys, threading, tkinter as tk
-from tkinter import filedialog, messagebox, scrolledtext, ttk
+from tkinter import filedialog, messagebox
+
+import customtkinter as ctk
 
 STEAM_APPID = "553850"  # Helldivers 2
 DEFAULT_UI_LANG = "us"
@@ -111,11 +114,6 @@ LANG_NAMES = {
            "ko": "\ud55c\uad6d\uc5b4 (\ud32c\ub354\ube59)"},
 }
 LANG_NAMES["ms"] = LANG_NAMES["es"]
-
-CARD_ACCENTS = {
-    "mod": "#ff6b6b", "dir": "#4da6ff", "langs": "#ffb000", "voices": "#5be7a9",
-    "fandub": "#c77dff",
-}
 
 # -- cadenas de interfaz por idioma. "ms" reusa "es" (misma variante de
 # idioma, ver STRINGS["ms"] = STRINGS["es"] en build_mod.py). --
@@ -663,21 +661,204 @@ I18N = {
 }
 I18N["ms"] = I18N["es"]
 
+# -- cadenas para los mods NPC (Ship & Air, Mission) y los botones por mod.
+# Van aparte y se mezclan en I18N para no reescribir los bloques de arriba. --
+I18N_NPC = {
+"us": {
+    "ship_title": "Ship & Air Voices",
+    "ship_sub": "Optional. Folder where you unzipped \"Helldivers International - ShipAir\". "
+                "Each character (Eagle-1, Pelican-1, ship crew...) gets a random language.",
+    "mission_title": "Mission Voices",
+    "mission_sub": "Optional. Folder where you unzipped \"Helldivers International - Mission\". "
+                   "SEAF troopers and civilians each get a random language.",
+    "btn_randomize_all": "RANDOMIZE ALL", "only_label": "Only:", "btn_clear": "Clear",
+    "err_no_mods": "Choose at least one mod folder (main, Ship & Air or Mission).",
+    "err_kind_wrong": "That folder isn't the \"{name}\" mod. Choose the folder where you "
+                      "unzipped it.",
+},
+"es": {
+    "ship_title": "Voces de Nave y Aire",
+    "ship_sub": "Opcional. Carpeta donde descomprimiste \"Helldivers International - ShipAir\". "
+                "Cada personaje (Águila-1, Pelícano-1, tripulación...) recibe un idioma al azar.",
+    "mission_title": "Voces de Misión",
+    "mission_sub": "Opcional. Carpeta donde descomprimiste \"Helldivers International - Mission\". "
+                   "Los soldados SEAF y los civiles reciben cada uno un idioma al azar.",
+    "btn_randomize_all": "RANDOMIZAR TODO", "only_label": "Solo:", "btn_clear": "Quitar",
+    "err_no_mods": "Elige al menos una carpeta de mod (principal, Nave y Aire o Misión).",
+    "err_kind_wrong": "Esa carpeta no es el mod \"{name}\". Elige la carpeta donde lo "
+                      "descomprimiste.",
+},
+"jp": {
+    "ship_title": "艦艇・航空ボイス",
+    "ship_sub": "任意。「Helldivers International - ShipAir」を解凍したフォルダ。各キャラクター"
+                "（イーグル1、ペリカン1、乗組員など）にランダムな言語が割り当てられます。",
+    "mission_title": "ミッションボイス",
+    "mission_sub": "任意。「Helldivers International - Mission」を解凍したフォルダ。SEAF兵と"
+                   "民間人にそれぞれランダムな言語が割り当てられます。",
+    "btn_randomize_all": "すべてランダマイズ", "only_label": "個別：", "btn_clear": "解除",
+    "err_no_mods": "MODフォルダを少なくとも1つ選んでください（メイン、艦艇・航空、ミッション）。",
+    "err_kind_wrong": "そのフォルダは「{name}」MODではありません。解凍したフォルダを選んでください。",
+},
+"de": {
+    "ship_title": "Schiffs- & Luftstimmen",
+    "ship_sub": "Optional. Ordner, in den du \"Helldivers International - ShipAir\" entpackt "
+                "hast. Jede Figur (Eagle-1, Pelican-1, Schiffscrew...) bekommt eine zufällige "
+                "Sprache.",
+    "mission_title": "Missionsstimmen",
+    "mission_sub": "Optional. Ordner, in den du \"Helldivers International - Mission\" entpackt "
+                   "hast. SEAF-Soldaten und Zivilisten bekommen je eine zufällige Sprache.",
+    "btn_randomize_all": "ALLES WÜRFELN", "only_label": "Nur:", "btn_clear": "Entfernen",
+    "err_no_mods": "Wähle mindestens einen Mod-Ordner (Haupt, Schiff & Luft oder Mission).",
+    "err_kind_wrong": "Dieser Ordner ist nicht der Mod \"{name}\". Wähle den Ordner, in den du "
+                      "ihn entpackt hast.",
+},
+"fr": {
+    "ship_title": "Voix Vaisseau & Aérien",
+    "ship_sub": "Facultatif. Dossier où tu as décompressé « Helldivers International - "
+                "ShipAir ». Chaque personnage (Eagle-1, Pelican-1, équipage...) reçoit une "
+                "langue au hasard.",
+    "mission_title": "Voix de mission",
+    "mission_sub": "Facultatif. Dossier où tu as décompressé « Helldivers International - "
+                   "Mission ». Les soldats SEAF et les civils reçoivent chacun une langue au "
+                   "hasard.",
+    "btn_randomize_all": "TOUT RANDOMISER", "only_label": "Seulement :", "btn_clear": "Retirer",
+    "err_no_mods": "Choisis au moins un dossier de mod (principal, Vaisseau & Aérien ou Mission).",
+    "err_kind_wrong": "Ce dossier n'est pas le mod « {name} ». Choisis le dossier où tu l'as "
+                      "décompressé.",
+},
+"it": {
+    "ship_title": "Voci Nave & Aria",
+    "ship_sub": "Facoltativo. Cartella dove hai estratto \"Helldivers International - ShipAir\". "
+                "Ogni personaggio (Eagle-1, Pelican-1, equipaggio...) riceve una lingua a caso.",
+    "mission_title": "Voci di missione",
+    "mission_sub": "Facoltativo. Cartella dove hai estratto \"Helldivers International - "
+                   "Mission\". I soldati SEAF e i civili ricevono ciascuno una lingua a caso.",
+    "btn_randomize_all": "RANDOMIZZA TUTTO", "only_label": "Solo:", "btn_clear": "Rimuovi",
+    "err_no_mods": "Scegli almeno una cartella di mod (principale, Nave & Aria o Missione).",
+    "err_kind_wrong": "Quella cartella non è la mod \"{name}\". Scegli la cartella dove l'hai "
+                      "estratta.",
+},
+"bp": {
+    "ship_title": "Vozes da Nave e Aéreas",
+    "ship_sub": "Opcional. Pasta onde você descompactou \"Helldivers International - ShipAir\". "
+                "Cada personagem (Eagle-1, Pelican-1, tripulação...) recebe um idioma aleatório.",
+    "mission_title": "Vozes de Missão",
+    "mission_sub": "Opcional. Pasta onde você descompactou \"Helldivers International - "
+                   "Mission\". Os soldados SEAF e os civis recebem cada um um idioma aleatório.",
+    "btn_randomize_all": "RANDOMIZAR TUDO", "only_label": "Só:", "btn_clear": "Remover",
+    "err_no_mods": "Escolha pelo menos uma pasta de mod (principal, Nave e Aéreas ou Missão).",
+    "err_kind_wrong": "Essa pasta não é o mod \"{name}\". Escolha a pasta onde você o "
+                      "descompactou.",
+},
+"cn": {
+    "ship_title": "舰船与空中语音",
+    "ship_sub": "可选。解压「Helldivers International - ShipAir」的文件夹。每个角色（鹰-1、"
+                "鹈鹕-1、舰上人员等）会随机分配一种语言。",
+    "mission_title": "任务语音",
+    "mission_sub": "可选。解压「Helldivers International - Mission」的文件夹。SEAF士兵和平民"
+                   "各自随机分配一种语言。",
+    "btn_randomize_all": "全部随机分配", "only_label": "仅：", "btn_clear": "移除",
+    "err_no_mods": "请至少选择一个MOD文件夹（主MOD、舰船与空中或任务）。",
+    "err_kind_wrong": "该文件夹不是「{name}」MOD。请选择解压它的文件夹。",
+},
+"ru": {
+    "ship_title": "Голоса корабля и авиации",
+    "ship_sub": "Необязательно. Папка, куда вы распаковали «Helldivers International - "
+                "ShipAir». Каждый персонаж (Орёл-1, Пеликан-1, экипаж...) получает случайный "
+                "язык.",
+    "mission_title": "Голоса миссий",
+    "mission_sub": "Необязательно. Папка, куда вы распаковали «Helldivers International - "
+                   "Mission». Солдаты SEAF и гражданские получают каждый случайный язык.",
+    "btn_randomize_all": "РАНДОМИЗИРОВАТЬ ВСЁ", "only_label": "Только:", "btn_clear": "Убрать",
+    "err_no_mods": "Выберите хотя бы одну папку мода (основной, корабль и авиация или миссии).",
+    "err_kind_wrong": "Эта папка — не мод «{name}». Выберите папку, куда вы его распаковали.",
+},
+"ko": {
+    "ship_title": "함선 및 항공 음성",
+    "ship_sub": "선택 사항. \"Helldivers International - ShipAir\"의 압축을 푼 폴더. 각 캐릭터"
+                "(이글-1, 펠리컨-1, 승무원 등)에 무작위 언어가 지정됩니다.",
+    "mission_title": "임무 음성",
+    "mission_sub": "선택 사항. \"Helldivers International - Mission\"의 압축을 푼 폴더. SEAF "
+                   "병사와 민간인에게 각각 무작위 언어가 지정됩니다.",
+    "btn_randomize_all": "모두 랜덤화", "only_label": "개별:", "btn_clear": "제거",
+    "err_no_mods": "모드 폴더를 하나 이상 선택하세요(메인, 함선 및 항공, 임무).",
+    "err_kind_wrong": "이 폴더는 \"{name}\" 모드가 아닙니다. 압축을 푼 폴더를 선택하세요.",
+},
+}
+for _lang, _strings in I18N_NPC.items():
+    I18N[_lang].update(_strings)  # "ms" es el mismo dict que "es"
+
+# nombres de personaje NPC por idioma de interfaz (copiado de build_npc.MOD;
+# ru/ko traducidos a mano)
+NPC_NAMES = {
+    "us": {"eagle": "Eagle-1", "pelican": "Pelican-1", "shipcomputer": "Ship computer",
+           "control": "Mission Control", "democracy": "Democracy Officer",
+           "shipmaster": "Ship Master", "engineer": "Engineer", "seaf": "SEAF troopers",
+           "civilian": "Civilians"},
+    "es": {"eagle": "Águila-1", "pelican": "Pelícano-1", "shipcomputer": "Computadora de la nave",
+           "control": "Control de Misión", "democracy": "Oficial de Democracia",
+           "shipmaster": "Capitana de la nave", "engineer": "Ingeniera",
+           "seaf": "Soldados SEAF", "civilian": "Civiles"},
+    "jp": {"eagle": "イーグル1", "pelican": "ペリカン1", "shipcomputer": "艦のコンピューター",
+           "control": "ミッションコントロール", "democracy": "民主主義士官", "shipmaster": "艦長",
+           "engineer": "エンジニア", "seaf": "SEAF兵", "civilian": "民間人"},
+    "de": {"eagle": "Eagle-1", "pelican": "Pelican-1", "shipcomputer": "Schiffscomputer",
+           "control": "Einsatzleitung", "democracy": "Demokratieoffizier",
+           "shipmaster": "Schiffsmeisterin", "engineer": "Ingenieurin",
+           "seaf": "SEAF-Soldaten", "civilian": "Zivilisten"},
+    "fr": {"eagle": "Eagle-1", "pelican": "Pelican-1", "shipcomputer": "Ordinateur du vaisseau",
+           "control": "Contrôle de mission", "democracy": "Officier de la Démocratie",
+           "shipmaster": "Maîtresse du vaisseau", "engineer": "Ingénieure",
+           "seaf": "Soldats SEAF", "civilian": "Civils"},
+    "it": {"eagle": "Eagle-1", "pelican": "Pelican-1", "shipcomputer": "Computer della nave",
+           "control": "Controllo missione", "democracy": "Ufficiale della Democrazia",
+           "shipmaster": "Comandante della nave", "engineer": "Ingegnere",
+           "seaf": "Soldati SEAF", "civilian": "Civili"},
+    "bp": {"eagle": "Eagle-1", "pelican": "Pelican-1", "shipcomputer": "Computador da nave",
+           "control": "Controle de Missão", "democracy": "Oficial da Democracia",
+           "shipmaster": "Comandante da nave", "engineer": "Engenheira",
+           "seaf": "Soldados SEAF", "civilian": "Civis"},
+    "cn": {"eagle": "鹰-1", "pelican": "鹈鹕-1", "shipcomputer": "舰船电脑", "control": "任务控制",
+           "democracy": "民主官", "shipmaster": "舰长", "engineer": "工程师",
+           "seaf": "SEAF士兵", "civilian": "平民"},
+    "ru": {"eagle": "Орёл-1", "pelican": "Пеликан-1", "shipcomputer": "Бортовой компьютер",
+           "control": "Центр управления", "democracy": "Офицер демократии",
+           "shipmaster": "Капитан корабля", "engineer": "Инженер",
+           "seaf": "Солдаты SEAF", "civilian": "Гражданские"},
+    "ko": {"eagle": "이글-1", "pelican": "펠리컨-1", "shipcomputer": "함선 컴퓨터",
+           "control": "임무 통제", "democracy": "민주주의 장교", "shipmaster": "함장",
+           "engineer": "엔지니어", "seaf": "SEAF 병사", "civilian": "민간인"},
+}
+NPC_NAMES["ms"] = NPC_NAMES["es"]
+
 VOICE_MODE_CODES = ["own", "gender", "any"]
 
-# tema oscuro estilo Super Earth, con una franja de color distinta por card
-BG = "#121214"
-PANEL = "#1c1c1f"
-FIELD = "#0c0c0e"
-FG = "#eae7dd"
-MUTED = "#8f8d85"
-ACCENT = "#ffb000"       # amarillo Helldivers
-BORDER = "#333338"
-FONT_TITLE = ("Segoe UI", 17, "bold")
-FONT_SUB = ("Segoe UI", 9)
-FONT_HEAD = ("Segoe UI", 10, "bold")
-FONT_BODY = ("Segoe UI", 9)
-FONT_BTN = ("Segoe UI", 11, "bold")
+# tipos de mod: carpeta que lo delata, clave de config, titulo en I18N, color.
+# = randomize_voices.KIND_MARKER, copiado: importarlo arrastra numpy/lz4/core.
+KINDS = ["helldiver", "ship", "mission"]
+KIND_MARKER = {"helldiver": "female1", "ship": "eagle", "mission": "seaf"}
+KIND_CFG = {"helldiver": "mod_dir", "ship": "ship_dir", "mission": "mission_dir"}
+KIND_TITLE = {"helldiver": "mod_title", "ship": "ship_title", "mission": "mission_title"}
+KIND_SUB = {"helldiver": "mod_sub", "ship": "ship_sub", "mission": "mission_sub"}
+KIND_SHORT = {"helldiver": "Helldivers", "ship": "Ship & Air", "mission": "Mission"}
+KIND_ACCENT = {"helldiver": "#ff6b6b", "ship": "#4dd4ff", "mission": "#7ee081"}
+
+# tema oscuro Super Earth: fondo azul-negro, paneles apenas mas claros con
+# borde, amarillo Helldivers de acento y un color propio por seccion.
+BG = "#0e1116"
+PANEL = "#171b23"
+PANEL_HI = "#212633"
+FIELD = "#0a0c10"
+FG = "#ecebe6"
+MUTED = "#969aa5"
+BORDER = "#2b303c"
+ACCENT = "#ffc233"          # amarillo Helldivers
+ACCENT_HOVER = "#ffd466"
+ACCENT_TEXT = "#1b1500"
+CARD_ACCENTS = {"dir": "#8fa3ff", "langs": ACCENT, "voices": "#5be7a9", "fandub": "#c77dff"}
+MONO = "Consolas" if sys.platform == "win32" else "DejaVu Sans Mono"
+
+FONTS = {}  # se llenan en App.__init__ (CTkFont necesita la ventana creada)
 
 
 def voice_display(ui_lang, short):
@@ -707,73 +888,70 @@ def save_config(cfg):
         pass
 
 
-class Card(tk.Frame):
-    """Panel con franja de color y titulo, estilo ficha de mision -- no un
-    LabelFrame generico. Cada card tiene su propio color de franja para que
-    la ventana no sea un solo tono."""
+class Card(ctk.CTkFrame):
+    """Panel redondeado con un punto de color y titulo, estilo ficha de
+    mision. Cada card tiene su propio color para que la ventana no sea un
+    solo tono."""
     def __init__(self, master, title, accent, subtitle=None):
-        super().__init__(master, bg=PANEL, highlightbackground=BORDER, highlightthickness=1)
-        strip = tk.Frame(self, bg=accent, width=4)
-        strip.pack(side="left", fill="y")
-        inner = tk.Frame(self, bg=PANEL)
-        inner.pack(side="left", fill="both", expand=True)
-        tk.Label(inner, text=title.upper(), bg=PANEL, fg=accent, font=FONT_HEAD,
-                  anchor="w").pack(fill="x", padx=12, pady=(10, 0))
+        super().__init__(master, fg_color=PANEL, corner_radius=14, border_width=1,
+                         border_color=BORDER)
+        head = ctk.CTkFrame(self, fg_color="transparent")
+        head.pack(fill="x", padx=18, pady=(14, 0))
+        ctk.CTkFrame(head, fg_color=accent, width=10, height=10, corner_radius=5
+                     ).pack(side="left", padx=(0, 10))
+        ctk.CTkLabel(head, text=title.upper(), text_color=accent, font=FONTS["head"],
+                     anchor="w").pack(side="left")
         if subtitle:
-            tk.Label(inner, text=subtitle, bg=PANEL, fg=MUTED, font=("Segoe UI", 8),
-                      anchor="w", justify="left", wraplength=430).pack(
-                fill="x", padx=12, pady=(2, 0))
-        self.body = tk.Frame(inner, bg=PANEL)
-        self.body.pack(fill="both", expand=True, padx=12, pady=(8, 12))
+            ctk.CTkLabel(self, text=subtitle, text_color=MUTED, font=FONTS["small"],
+                         anchor="w", justify="left", wraplength=560
+                         ).pack(fill="x", padx=18, pady=(4, 0))
+        self.body = ctk.CTkFrame(self, fg_color="transparent")
+        self.body.pack(fill="both", expand=True, padx=18, pady=(10, 16))
 
 
-class App(tk.Tk):
+class App(ctk.CTk):
     def __init__(self):
-        super().__init__()
-        self.configure(bg=BG)
-        self.geometry("660x680")
-        self.minsize(520, 420)
-        self.resizable(True, True)
+        ctk.set_appearance_mode("dark")
+        super().__init__(fg_color=BG)
+        self.geometry("700x780")
+        self.minsize(560, 480)
+        FONTS.update(
+            title=ctk.CTkFont(size=22, weight="bold"), sub=ctk.CTkFont(size=12),
+            head=ctk.CTkFont(size=13, weight="bold"), body=ctk.CTkFont(size=13),
+            small=ctk.CTkFont(size=12), btn=ctk.CTkFont(size=16, weight="bold"),
+            btn_small=ctk.CTkFont(size=13, weight="bold"), mono=ctk.CTkFont(family=MONO, size=12))
         self.cfg = load_config()
-        self._init_style()
         self._init_vars()
+        self.busy = False
 
-        # barra de idioma de interfaz: vive AFUERA del contenido reconstruible,
-        # para no perderse a si misma cuando el resto se redibuja.
-        bar = tk.Frame(self, bg=BG)
-        bar.pack(fill="x", padx=16, pady=(10, 0))
-        self.ui_lang_label = tk.Label(bar, bg=BG, fg=MUTED, font=FONT_BODY, anchor="w")
-        self.ui_lang_label.pack(side="left")
-        self.ui_lang_combo = ttk.Combobox(
-            bar, textvariable=self.ui_lang_display_var,
-            values=[UI_LANG_ENDONYMS[c] for c in UI_LANG_ORDER],
-            state="readonly", width=16, style="Dark.TCombobox")
-        self.ui_lang_combo.pack(side="right")
-        self.ui_lang_combo.bind("<<ComboboxSelected>>", self.on_ui_lang_change)
+        # cabecera fija: titulo + selector de idioma de interfaz. Vive AFUERA
+        # del contenido reconstruible, para no perderse a si misma cuando el
+        # resto se redibuja al cambiar de idioma.
+        bar = ctk.CTkFrame(self, fg_color="transparent")
+        bar.pack(fill="x", padx=22, pady=(16, 6))
+        titles = ctk.CTkFrame(bar, fg_color="transparent")
+        titles.pack(side="left")
+        ctk.CTkLabel(titles, text="☄ HELLDIVERS INTERNATIONAL", text_color=ACCENT,
+                     font=FONTS["title"], anchor="w").pack(anchor="w")
+        self.subtitle_label = ctk.CTkLabel(titles, text_color=MUTED, font=FONTS["sub"],
+                                           anchor="w")
+        self.subtitle_label.pack(anchor="w")
+        self.ui_lang_menu = self._option_menu(
+            bar, [UI_LANG_ENDONYMS[c] for c in UI_LANG_ORDER], self.ui_lang_display_var,
+            self.on_ui_lang_change, width=170)
+        self.ui_lang_menu.pack(side="right")
+        self.ui_lang_label = ctk.CTkLabel(bar, text_color=MUTED, font=FONTS["small"])
+        self.ui_lang_label.pack(side="right", padx=(0, 8))
+        ctk.CTkFrame(self, fg_color=ACCENT, height=3, corner_radius=2).pack(fill="x", padx=22)
 
-        # Las opciones ocupan una region desplazable; las acciones principales
-        # quedan fijas abajo para que Randomize siempre este disponible.
-        self.content = tk.Frame(self, bg=BG)
-        self.content.pack(fill="both", expand=True)
-        self.content.grid_rowconfigure(0, weight=1)
-        self.content.grid_columnconfigure(0, weight=1)
-        self.canvas = tk.Canvas(self.content, bg=BG, highlightthickness=0, bd=0)
-        self.canvas.grid(row=0, column=0, sticky="nsew")
-        self.scrollbar = ttk.Scrollbar(self.content, orient="vertical",
-                                       command=self.canvas.yview)
-        self.scrollbar.grid(row=0, column=1, sticky="ns")
-        self.canvas.configure(yscrollcommand=self.scrollbar.set)
-        self.options_frame = tk.Frame(self.canvas, bg=BG)
-        self.canvas_window = self.canvas.create_window(
-            (0, 0), window=self.options_frame, anchor="nw")
-        self.options_frame.bind("<Configure>", self._update_scroll_region)
-        self.canvas.bind("<Configure>", self._resize_options_frame)
-        self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
-        self.canvas.bind_all("<Button-4>", self._on_mousewheel)
-        self.canvas.bind_all("<Button-5>", self._on_mousewheel)
-
-        self.footer = tk.Frame(self, bg=BG)
-        self.footer.pack(fill="x", padx=16, pady=(4, 10))
+        # opciones en una region desplazable; las acciones quedan fijas abajo
+        # para que Randomizar siempre este a mano.
+        self.scroll = ctk.CTkScrollableFrame(
+            self, fg_color="transparent", scrollbar_button_color=PANEL_HI,
+            scrollbar_button_hover_color=BORDER)
+        self.scroll.pack(fill="both", expand=True, padx=10, pady=(8, 0))
+        self.footer = ctk.CTkFrame(self, fg_color="transparent")
+        self.footer.pack(fill="x", padx=22, pady=(8, 14))
         self._build_content()
 
         self.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -787,205 +965,186 @@ class App(tk.Tk):
             self.ui_lang = DEFAULT_UI_LANG
         self.ui_lang_display_var = tk.StringVar(value=UI_LANG_ENDONYMS[self.ui_lang])
 
-        self.mod_dir_var = tk.StringVar(value=self.cfg.get("mod_dir", ""))
-        self.dir_var = tk.StringVar(value=self.cfg.get("game_dir", ""))
+        self.dir_vars = {k: tk.StringVar(value=self.cfg.get(KIND_CFG[k], "")) for k in KINDS}
+        self.game_dir_var = tk.StringVar(value=self.cfg.get("game_dir", ""))
 
         excluded = set(self.cfg.get("excluded_langs", []))
         self.lang_vars = {code: tk.BooleanVar(value=code in excluded)
-                           for code in LANG_NAMES["us"] if code != "ru" and code != "ko"}
+                          for code in LANG_NAMES["us"] if code not in FANDUB_LANGS}
 
         fandub_enabled = set(self.cfg.get("fandub_langs", []))
         self.fandub_vars = {code: tk.BooleanVar(value=code in fandub_enabled)
-                             for code in FANDUB_LANGS}
+                            for code in FANDUB_LANGS}
 
         saved_modes = self.cfg.get("slot_modes", {})
         self.mode_vars = {short: tk.StringVar(value=saved_modes.get(short, "any"))
-                           for short in VOICE_ORDER}  # guarda el CODIGO, no la etiqueta
+                          for short in VOICE_ORDER}  # guarda el CODIGO, no la etiqueta
 
         self.balance_var = tk.BooleanVar(value=self.cfg.get("balance_genders", False))
         self.avoid_repeat_var = tk.BooleanVar(value=self.cfg.get("avoid_repeat_langs", True))
 
-    def on_ui_lang_change(self, event=None):
-        label = self.ui_lang_display_var.get()
-        code = next((c for c in UI_LANG_ORDER if UI_LANG_ENDONYMS[c] == label), DEFAULT_UI_LANG)
-        self.ui_lang = code
-        self.cfg["ui_lang"] = code
-        save_config(self.cfg)
-        for child in self.options_frame.winfo_children():
-            child.destroy()
-        for child in self.footer.winfo_children():
-            child.destroy()
+    def on_ui_lang_change(self, label):
+        self.ui_lang = next((c for c in UI_LANG_ORDER if UI_LANG_ENDONYMS[c] == label),
+                            DEFAULT_UI_LANG)
+        self.save()
+        for frame in (self.scroll, self.footer):
+            for child in frame.winfo_children():
+                child.destroy()
         self._build_content()
-        self.canvas.yview_moveto(0)
-
-    def _update_scroll_region(self, event=None):
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-
-    def _resize_options_frame(self, event):
-        self.canvas.itemconfigure(self.canvas_window, width=event.width)
-
-    def _on_mousewheel(self, event):
-        # Tk usa delta en Windows/macOS y botones 4/5 en Linux.
-        if event.num == 4:
-            step = -1
-        elif event.num == 5:
-            step = 1
-        else:
-            step = -1 if event.delta > 0 else 1
-        self.canvas.yview_scroll(step * 3, "units")
+        self.scroll._parent_canvas.yview_moveto(0)
 
     def _build_content(self):
         S = self.S
         self.title(f"Helldivers International - {S('subtitle')}")
-        self.ui_lang_label.configure(text=S("ui_lang_label") + ":")
+        self.subtitle_label.configure(text=S("subtitle"))
+        self.ui_lang_label.configure(text=S("ui_lang_label"))
+        outer = {"fill": "x", "padx": 12, "pady": 7}
+        c = self.scroll
 
-        outer = {"padx": 12, "pady": 6}
-        c = self.options_frame
+        # -- carpetas de los tres mods (basta con una) y del juego --
+        for kind in KINDS:
+            card = Card(c, S(KIND_TITLE[kind]), KIND_ACCENT[kind], S(KIND_SUB[kind]))
+            card.pack(**outer)
+            self._folder_row(card.body, self.dir_vars[kind], KIND_ACCENT[kind],
+                             lambda k=kind: self.choose_mod_dir(k),
+                             lambda k=kind: self.clear_mod_dir(k))
+        card = Card(c, S("dir_title"), CARD_ACCENTS["dir"], S("dir_sub"))
+        card.pack(**outer)
+        self._folder_row(card.body, self.game_dir_var, CARD_ACCENTS["dir"], self.choose_dir)
 
-        header = tk.Frame(c, bg=BG)
-        header.pack(fill="x")
-        tk.Label(header, text="\u2604 HELLDIVERS INTERNATIONAL", bg=BG, fg=ACCENT,
-                  font=FONT_TITLE).pack(pady=(8, 0))
-        tk.Label(header, text=S("subtitle"), bg=BG, fg=MUTED, font=FONT_SUB).pack(pady=(0, 10))
-        tk.Frame(c, bg=ACCENT, height=3).pack(fill="x", padx=16)
-
-        # -- carpeta del mod principal --
-        c0 = Card(c, S("mod_title"), CARD_ACCENTS["mod"], S("mod_sub"))
-        c0.pack(fill="x", **outer)
-        row0 = tk.Frame(c0.body, bg=PANEL)
-        row0.pack(fill="x")
-        tk.Entry(row0, textvariable=self.mod_dir_var, width=32, state="readonly",
-                  bg=FIELD, fg=FG, readonlybackground=FIELD,
-                  insertbackground=FG, relief="flat").pack(side="left", fill="x", expand=True,
-                                                              ipady=3)
-        self._button(row0, S("btn_choose"), self.choose_mod_dir, accent=CARD_ACCENTS["mod"]
-                     ).pack(side="left", padx=(8, 0))
-
-        # -- carpeta del juego --
-        c1 = Card(c, S("dir_title"), CARD_ACCENTS["dir"], S("dir_sub"))
-        c1.pack(fill="x", **outer)
-        row = tk.Frame(c1.body, bg=PANEL)
-        row.pack(fill="x")
-        tk.Entry(row, textvariable=self.dir_var, width=32, state="readonly",
-                  bg=FIELD, fg=FG, readonlybackground=FIELD,
-                  insertbackground=FG, relief="flat").pack(side="left", fill="x", expand=True,
-                                                             ipady=3)
-        self._button(row, S("btn_choose"), self.choose_dir, accent=CARD_ACCENTS["dir"]
-                     ).pack(side="left", padx=(8, 0))
-
-        # -- idiomas a excluir --
-        c2 = Card(c, S("langs_title"), CARD_ACCENTS["langs"], S("langs_sub"))
-        c2.pack(fill="x", **outer)
+        # -- idiomas a excluir (valen para los tres mods) --
+        card = Card(c, S("langs_title"), CARD_ACCENTS["langs"], S("langs_sub"))
+        card.pack(**outer)
         names = LANG_NAMES.get(self.ui_lang, LANG_NAMES["us"])
         items = sorted(self.lang_vars.items(), key=lambda kv: names.get(kv[0], kv[0]))
         for i, (code, var) in enumerate(items):
-            self._check(c2.body, names.get(code, code), var).grid(
-                row=i // 3, column=i % 3, sticky="w", padx=(0, 16), pady=3)
+            self._check(card.body, names.get(code, code), var).grid(
+                row=i // 3, column=i % 3, sticky="w", padx=(0, 18), pady=5)
 
-        # -- restricciones de voz --
-        c4 = Card(c, S("voices_title"), CARD_ACCENTS["voices"], S("voices_sub"))
-        c4.pack(fill="x", **outer)
-        mode_label_by_code = {"own": S("mode_own"), "gender": S("mode_gender"), "any": S("mode_any")}
-        code_by_mode_label = {v: k for k, v in mode_label_by_code.items()}
+        # -- restricciones de voz (solo mod Helldiver) --
+        card = Card(c, S("voices_title"), CARD_ACCENTS["voices"], S("voices_sub"))
+        card.pack(**outer)
+        label_by_code = {"own": S("mode_own"), "gender": S("mode_gender"), "any": S("mode_any")}
+        code_by_label = {v: k for k, v in label_by_code.items()}
         for short in VOICE_ORDER:
-            row = tk.Frame(c4.body, bg=PANEL)
+            row = ctk.CTkFrame(card.body, fg_color="transparent")
             row.pack(fill="x", pady=4)
-            tk.Label(row, text=voice_display(self.ui_lang, short), bg=PANEL, fg=FG,
-                      font=FONT_BODY, width=16, anchor="w").pack(side="left")
-            display_var = tk.StringVar(value=mode_label_by_code[self.mode_vars[short].get()])
-            cb = ttk.Combobox(row, textvariable=display_var,
-                                values=list(mode_label_by_code.values()),
-                                state="readonly", width=20, style="Dark.TCombobox")
-            cb.pack(side="left")
+            ctk.CTkLabel(row, text=voice_display(self.ui_lang, short), text_color=FG,
+                         font=FONTS["body"], width=150, anchor="w").pack(side="left")
+            display_var = tk.StringVar(value=label_by_code[self.mode_vars[short].get()])
 
-            def on_pick(e, short=short, display_var=display_var, code_map=code_by_mode_label):
-                self.mode_vars[short].set(code_map[display_var.get()])
+            def on_pick(label, short=short):
+                self.mode_vars[short].set(code_by_label[label])
                 self.save()
-            cb.bind("<<ComboboxSelected>>", on_pick)
-        tk.Frame(c4.body, bg=BORDER, height=1).pack(fill="x", pady=(8, 8))
-        self._check(c4.body, S("balance_label"), self.balance_var).pack(anchor="w")
-        self._check(c4.body, S("avoid_repeat_label"), self.avoid_repeat_var).pack(anchor="w")
+            self._option_menu(row, list(label_by_code.values()), display_var, on_pick,
+                              width=300).pack(side="left")
+        ctk.CTkFrame(card.body, fg_color=BORDER, height=1).pack(fill="x", pady=(10, 8))
+        self._switch(card.body, S("balance_label"), self.balance_var).pack(anchor="w", pady=3)
+        self._switch(card.body, S("avoid_repeat_label"), self.avoid_repeat_var
+                     ).pack(anchor="w", pady=3)
 
         # -- fandubs --
         # Ojo: NO es una carpeta aparte. Solo tiene efecto si "Mod principal"
         # de arriba apunta a la variante +Fandubs (la gente baja UNA de las
         # dos, no las dos) -- esos idiomas viven en esa misma carpeta.
-        c3 = Card(c, S("fandub_title"), CARD_ACCENTS["fandub"], S("fandub_sub"))
-        c3.pack(fill="x", **outer)
-        frow = tk.Frame(c3.body, bg=PANEL)
-        frow.pack(fill="x")
+        card = Card(c, S("fandub_title"), CARD_ACCENTS["fandub"], S("fandub_sub"))
+        card.pack(**outer)
+        row = ctk.CTkFrame(card.body, fg_color="transparent")
+        row.pack(fill="x")
         for code in FANDUB_LANGS:
-            self._check(frow, names.get(code, code), self.fandub_vars[code]
-                        ).pack(side="left", padx=(0, 16))
+            self._switch(row, names.get(code, code), self.fandub_vars[code]
+                         ).pack(side="left", padx=(0, 24))
 
-        # -- botones principales --
-        f3 = tk.Frame(self.footer, bg=BG)
-        f3.pack(fill="x", pady=(0, 6))
-        self.randomize_btn = self._button(f3, f"\u2604  {S('btn_randomize')}",
-                                            self.on_randomize, primary=True)
-        self.randomize_btn.pack(side="left", fill="x", expand=True, ipady=4)
+        # -- acciones --
+        self.all_btn = ctk.CTkButton(
+            self.footer, text=f"☄  {S('btn_randomize_all')}", command=self.on_randomize,
+            fg_color=ACCENT, hover_color=ACCENT_HOVER, text_color=ACCENT_TEXT,
+            text_color_disabled="#5c4a14", font=FONTS["btn"], height=48, corner_radius=12)
+        self.all_btn.pack(fill="x")
+        row = ctk.CTkFrame(self.footer, fg_color="transparent")
+        row.pack(fill="x", pady=(10, 8))
+        ctk.CTkLabel(row, text=S("only_label"), text_color=MUTED, font=FONTS["small"]
+                     ).pack(side="left", padx=(2, 10))
+        self.kind_btns = {}
+        for kind in KINDS:
+            b = self._outline_button(row, KIND_SHORT[kind], KIND_ACCENT[kind],
+                                     lambda k=kind: self.on_randomize(k))
+            b.pack(side="left", padx=(0, 8))
+            self.kind_btns[kind] = b
         if sys.platform == "win32":
             # en Linux "steam://run" no siempre tiene un handler registrado
             # (probado, no abre nada) -- mas simple sacar el boton ahi que
             # hacer deteccion de instalacion Steam para lanzar el exe a mano.
-            self._button(f3, S("btn_open_game"), self.open_game, accent="#4da6ff"
-                         ).pack(side="left", padx=(10, 0), ipady=4)
+            self._outline_button(row, S("btn_open_game"), CARD_ACCENTS["dir"],
+                                 self.open_game).pack(side="right")
 
-        # -- log --
-        self.log_widget = scrolledtext.ScrolledText(
-            self.footer, width=60, height=3, state="disabled", bg=FIELD, fg=MUTED,
-            insertbackground=FG, relief="flat", font=("Consolas", 9),
-            borderwidth=0, highlightbackground=BORDER, highlightthickness=1)
+        self.log_widget = ctk.CTkTextbox(
+            self.footer, height=72, fg_color=FIELD, text_color=MUTED, font=FONTS["mono"],
+            corner_radius=10, border_width=1, border_color=BORDER, state="disabled")
         self.log_widget.pack(fill="x")
-
-    # -- estilo ttk (Combobox no se puede pintar con tk.Button directamente) --
-    def _init_style(self):
-        style = ttk.Style(self)
-        style.theme_use("clam")
-        style.configure("Dark.TCombobox", fieldbackground=FIELD, background=PANEL,
-                          foreground=FG, arrowcolor=ACCENT, bordercolor=BORDER,
-                          lightcolor=FIELD, darkcolor=FIELD, padding=4)
-        style.map("Dark.TCombobox",
-                    fieldbackground=[("readonly", FIELD)],
-                    foreground=[("readonly", FG)],
-                    background=[("readonly", PANEL)])
-        self.option_add("*TCombobox*Listbox.background", FIELD)
-        self.option_add("*TCombobox*Listbox.foreground", FG)
-        self.option_add("*TCombobox*Listbox.selectBackground", ACCENT)
-        self.option_add("*TCombobox*Listbox.selectForeground", "#161200")
+        self._refresh_buttons()
 
     # -- widgets con el tema aplicado --
-    def _button(self, master, text, command, primary=False, accent=ACCENT):
-        if primary:
-            bg, fg, hover = ACCENT, "#161200", "#ffc94d"
-        else:
-            bg, fg, hover = PANEL, accent, "#2a2a2e"
-        btn = tk.Button(master, text=text, command=command, bg=bg, fg=fg,
-                          activebackground=hover, activeforeground=fg,
-                          font=FONT_BTN if primary else FONT_BODY, relief="flat",
-                          bd=0, highlightbackground=accent, highlightthickness=1 if not primary
-                          else 0, padx=14, pady=6, cursor="hand2")
-        btn.bind("<Enter>", lambda e: btn.configure(bg=hover))
-        btn.bind("<Leave>", lambda e: btn.configure(bg=bg))
-        return btn
+    def _outline_button(self, master, text, accent, command, **kw):
+        return ctk.CTkButton(master, text=text, command=command, fg_color=PANEL_HI,
+                             hover_color=BORDER, text_color=accent, border_color=accent,
+                             border_width=1, text_color_disabled="#555a66",
+                             font=FONTS["btn_small"], height=34, corner_radius=10, **kw)
+
+    def _folder_row(self, master, var, accent, choose, clear=None):
+        row = ctk.CTkFrame(master, fg_color="transparent")
+        row.pack(fill="x")
+        ctk.CTkLabel(row, textvariable=var, fg_color=FIELD, text_color=FG, font=FONTS["small"],
+                     corner_radius=8, anchor="w", height=34).pack(
+            side="left", fill="x", expand=True)
+        self._outline_button(row, self.S("btn_choose"), accent, choose, width=100
+                             ).pack(side="left", padx=(8, 0))
+        if clear:
+            self._outline_button(row, "✕", MUTED, clear, width=34
+                                 ).pack(side="left", padx=(6, 0))
+
+    def _option_menu(self, master, values, var, command, width):
+        return ctk.CTkOptionMenu(
+            master, values=values, variable=var, command=command, width=width, height=32,
+            fg_color=FIELD, button_color=PANEL_HI, button_hover_color=BORDER, text_color=FG,
+            dropdown_fg_color=PANEL, dropdown_hover_color=PANEL_HI, dropdown_text_color=FG,
+            font=FONTS["body"], dropdown_font=FONTS["body"], corner_radius=8,
+            dynamic_resizing=False)
 
     def _check(self, master, text, var):
-        return tk.Checkbutton(master, text=text, variable=var, command=self.save,
-                                bg=PANEL, fg=FG, selectcolor=FIELD,
-                                activebackground=PANEL, activeforeground=ACCENT,
-                                font=FONT_BODY, highlightthickness=0)
+        return ctk.CTkCheckBox(master, text=text, variable=var, command=self.save,
+                               fg_color=ACCENT, hover_color=ACCENT_HOVER, border_color=BORDER,
+                               checkmark_color=ACCENT_TEXT, text_color=FG, font=FONTS["body"],
+                               corner_radius=6, checkbox_width=20, checkbox_height=20)
+
+    def _switch(self, master, text, var):
+        return ctk.CTkSwitch(master, text=text, variable=var, command=self.save,
+                             progress_color=ACCENT, fg_color=BORDER, button_color=FG,
+                             button_hover_color="#ffffff", text_color=FG, font=FONTS["body"])
+
+    def _refresh_buttons(self):
+        """Randomizar todo pide al menos un mod; cada boton suelto, el suyo."""
+        have = {k: bool(self.dir_vars[k].get()) for k in KINDS}
+        idle = "disabled" if self.busy else "normal"
+        self.all_btn.configure(state=idle if any(have.values()) else "disabled")
+        for kind, b in self.kind_btns.items():
+            b.configure(state=idle if have[kind] else "disabled")
 
     def log(self, msg):
+        # se llama desde el hilo del sorteo: tk solo se toca desde el principal
+        self.after(0, self._append_log, str(msg))
+
+    def _append_log(self, msg):
         self.log_widget.configure(state="normal")
-        self.log_widget.insert("end", str(msg) + "\n")
+        self.log_widget.insert("end", msg + "\n")
         self.log_widget.see("end")
         self.log_widget.configure(state="disabled")
-        self.update_idletasks()
 
     def save(self):
         self.cfg["ui_lang"] = self.ui_lang
-        self.cfg["mod_dir"] = self.mod_dir_var.get()
-        self.cfg["game_dir"] = self.dir_var.get()
+        for kind in KINDS:
+            self.cfg[KIND_CFG[kind]] = self.dir_vars[kind].get()
+        self.cfg["game_dir"] = self.game_dir_var.get()
         self.cfg["excluded_langs"] = [c for c, v in self.lang_vars.items() if v.get()]
         self.cfg["fandub_langs"] = [c for c, v in self.fandub_vars.items() if v.get()]
         self.cfg["slot_modes"] = {s: v.get() for s, v in self.mode_vars.items()}
@@ -993,26 +1152,33 @@ class App(tk.Tk):
         self.cfg["avoid_repeat_langs"] = self.avoid_repeat_var.get()
         save_config(self.cfg)
 
-    def choose_mod_dir(self):
-        start = self.mod_dir_var.get() or None
-        d = filedialog.askdirectory(title=self.S("mod_title"), initialdir=start)
+    def choose_mod_dir(self, kind):
+        start = self.dir_vars[kind].get() or None
+        d = filedialog.askdirectory(title=self.S(KIND_TITLE[kind]), initialdir=start)
         if not d:
             return
-        if not os.path.isfile(os.path.join(d, "manifest.json")):
-            messagebox.showerror(self.S("err_wrong_path_title"), self.S("err_mod_dir_wrong"))
+        if not os.path.isdir(os.path.join(d, KIND_MARKER[kind])):
+            messagebox.showerror(self.S("err_wrong_path_title"), self.S("err_kind_wrong").format(
+                name=self.S(KIND_TITLE[kind])))
             return
-        self.mod_dir_var.set(d)
+        self.dir_vars[kind].set(d)
         self.save()
+        self._refresh_buttons()
+
+    def clear_mod_dir(self, kind):
+        self.dir_vars[kind].set("")
+        self.save()
+        self._refresh_buttons()
 
     def choose_dir(self):
-        start = self.dir_var.get() or None
+        start = self.game_dir_var.get() or None
         d = filedialog.askdirectory(title=self.S("dir_title"), initialdir=start)
         if not d:
             return
         if not os.path.isfile(os.path.join(d, "bundles.nxa")):
             messagebox.showerror(self.S("err_wrong_path_title"), self.S("err_game_dir_wrong"))
             return
-        self.dir_var.set(d)
+        self.game_dir_var.set(d)
         self.save()
 
     def open_game(self):
@@ -1020,18 +1186,21 @@ class App(tk.Tk):
             os.startfile(f"steam://run/{STEAM_APPID}")
         except Exception as e:
             messagebox.showerror(self.S("err_open_game_title"),
-                                  self.S("err_open_game_body").format(e=e))
+                                 self.S("err_open_game_body").format(e=e))
             return
         self.save()
         self.destroy()
 
-    def on_randomize(self):
+    def on_randomize(self, only=None):
+        """only=None randomiza todos los mods con carpeta; si no, solo ese.
+        Los demas conservan lo que salio la vez anterior (write_patch)."""
         S = self.S
-        mod_dir = self.mod_dir_var.get()
-        if not mod_dir:
-            messagebox.showerror(S("err_missing_folder_title"), S("err_mod_dir_missing"))
+        mod_dirs = {k: self.dir_vars[k].get() for k in ([only] if only else KINDS)
+                    if self.dir_vars[k].get()}
+        if not mod_dirs:
+            messagebox.showerror(S("err_missing_folder_title"), S("err_no_mods"))
             return
-        game_dir = self.dir_var.get()
+        game_dir = self.game_dir_var.get()
         if not game_dir:
             messagebox.showerror(S("err_missing_folder_title"), S("err_game_dir_missing"))
             return
@@ -1039,73 +1208,86 @@ class App(tk.Tk):
         if len(excluded) == len(self.lang_vars):
             messagebox.showerror(S("err_no_langs_title"), S("err_no_langs"))
             return
-        fandub_langs = [c for c, v in self.fandub_vars.items() if v.get()]
-        slot_modes = {s: v.get() for s, v in self.mode_vars.items()}
-        balance_genders = self.balance_var.get()
-        avoid_repeat_langs = self.avoid_repeat_var.get()
+        kw = dict(excluded_langs=excluded, log=self.log,
+                  fandub_langs=[c for c, v in self.fandub_vars.items() if v.get()],
+                  slot_modes={s: v.get() for s, v in self.mode_vars.items()},
+                  balance_genders=self.balance_var.get(),
+                  avoid_repeat_langs=self.avoid_repeat_var.get())
         self.save()
-        self.randomize_btn.configure(state="disabled", text=S("btn_randomizing"))
-        threading.Thread(target=self._randomize_worker,
-                          args=(mod_dir, game_dir, excluded, fandub_langs, slot_modes,
-                                balance_genders, avoid_repeat_langs),
-                          daemon=True).start()
+        self.busy = True
+        self._refresh_buttons()
+        self.all_btn.configure(text=S("btn_randomizing"))
+        threading.Thread(target=self._randomize_worker, args=(game_dir, mod_dirs, kw),
+                         daemon=True).start()
 
-    def _randomize_worker(self, mod_dir, game_dir, excluded, fandub_langs, slot_modes,
-                           balance_genders, avoid_repeat_langs):
+    def _randomize_worker(self, game_dir, mod_dirs, kw):
         try:
             import randomize_voices as rv  # pesado (numpy/lz4/core) -- diferido al primer uso
-            picks = rv.run_randomize(mod_dir, game_dir, excluded_langs=excluded, log=self.log,
-                                      fandub_langs=fandub_langs, slot_modes=slot_modes,
-                                      balance_genders=balance_genders,
-                                      avoid_repeat_langs=avoid_repeat_langs)
-            self.after(0, self._on_randomize_done, picks)
+            results = rv.run_all(game_dir, mod_dirs, **kw)
+            self.after(0, self._on_randomize_done, results)
         except Exception as e:
             self.log(f"ERROR: {e}")
             S = self.S
             self.after(0, lambda: messagebox.showerror(
                 S("err_failed_title"), S("err_failed_body").format(e=e)))
-            self.after(0, lambda: self.randomize_btn.configure(
-                state="normal", text=S("btn_randomize")))
+            self.after(0, self._end_busy)
 
-    def _on_randomize_done(self, picks):
+    def _end_busy(self):
+        self.busy = False
+        self.all_btn.configure(text=f"☄  {self.S('btn_randomize_all')}")
+        self._refresh_buttons()
+
+    def _on_randomize_done(self, results):
         S = self.S
-        self.randomize_btn.configure(state="normal",
-                                       text=f"\u2604  {S('btn_randomize')}")
-        slot_colors = {"female1": CARD_ACCENTS["dir"], "male1": CARD_ACCENTS["voices"],
-                        "female2": CARD_ACCENTS["fandub"], "purist": CARD_ACCENTS["mod"]}
+        self._end_busy()
         names = LANG_NAMES.get(self.ui_lang, LANG_NAMES["us"])
+        npc_names = NPC_NAMES.get(self.ui_lang, NPC_NAMES["us"])
 
-        win = tk.Toplevel(self, bg=BG)
+        win = ctk.CTkToplevel(self, fg_color=BG)
         win.title(S("result_window_title"))
-        win.resizable(False, False)
         win.transient(self)
+        ctk.CTkLabel(win, text=f"✨ {S('result_header')}", text_color=ACCENT,
+                     font=FONTS["title"]).pack(pady=(22, 2), padx=28)
+        ctk.CTkLabel(win, text=S("result_sub"), text_color=MUTED, font=FONTS["sub"]
+                     ).pack(pady=(0, 10))
 
-        tk.Label(win, text=f"\u2728 {S('result_header')}", bg=BG, fg=ACCENT,
-                  font=("Segoe UI", 14, "bold")).pack(pady=(20, 2), padx=24)
-        tk.Label(win, text=S("result_sub"), bg=BG, fg=MUTED, font=FONT_SUB).pack(pady=(0, 16))
+        body = ctk.CTkScrollableFrame(win, fg_color="transparent", width=460,
+                                      height=min(520, 120 + 52 * sum(map(len, results.values()))))
+        body.pack(padx=18, fill="both", expand=True)
+        for kind in KINDS:
+            if kind not in results:
+                continue
+            color = KIND_ACCENT[kind]
+            ctk.CTkLabel(body, text=S(KIND_TITLE[kind]).upper(), text_color=color,
+                         font=FONTS["head"], anchor="w").pack(fill="x", padx=6, pady=(10, 4))
+            for pick in results[kind]:
+                if kind == "helldiver":
+                    t, s, lang = pick
+                    who, voice = voice_display(self.ui_lang, t), voice_display(self.ui_lang, s)
+                else:
+                    slot, lang = pick
+                    who, voice = npc_names.get(slot, slot), None
+                row = ctk.CTkFrame(body, fg_color=PANEL, corner_radius=10, border_width=1,
+                                   border_color=BORDER)
+                row.pack(fill="x", pady=3, padx=4)
+                ctk.CTkLabel(row, text=who, text_color=color, font=FONTS["head"], width=170,
+                             anchor="w").pack(side="left", padx=(14, 0), pady=8)
+                ctk.CTkLabel(row, text="→", text_color=MUTED, font=FONTS["head"]
+                             ).pack(side="left", padx=(0, 10))
+                if voice:
+                    ctk.CTkLabel(row, text=voice, text_color=FG, font=FONTS["head"]
+                                 ).pack(side="left")
+                    ctk.CTkLabel(row, text="  ·  ", text_color=MUTED, font=FONTS["body"]
+                                 ).pack(side="left")
+                ctk.CTkLabel(row, text=names.get(lang, lang), text_color=FG if not voice
+                             else MUTED, font=FONTS["body"]).pack(side="left")
 
-        body = tk.Frame(win, bg=BG)
-        body.pack(padx=24, fill="x")
-        for t, s, lang in picks:
-            color = slot_colors[t]
-            row = tk.Frame(body, bg=PANEL, highlightbackground=color, highlightthickness=1)
-            row.pack(fill="x", pady=5)
-            inner = tk.Frame(row, bg=PANEL)
-            inner.pack(fill="x", padx=14, pady=10)
-            tk.Label(inner, text=voice_display(self.ui_lang, t), bg=PANEL, fg=color,
-                      font=FONT_HEAD, width=15, anchor="w").pack(side="left")
-            tk.Label(inner, text="\u2192", bg=PANEL, fg=MUTED,
-                      font=("Segoe UI", 12, "bold")).pack(side="left", padx=(0, 10))
-            langname = names.get(lang, lang)
-            tk.Label(inner, text=voice_display(self.ui_lang, s), bg=PANEL, fg=FG,
-                      font=FONT_HEAD, anchor="w").pack(side="left")
-            tk.Label(inner, text=f"  \u00b7  {langname}", bg=PANEL, fg=MUTED, font=FONT_BODY,
-                      anchor="w").pack(side="left")
-
-        self._button(win, S("btn_close"), win.destroy, primary=True).pack(
-            pady=20, ipady=4, ipadx=10)
-        win.grab_set()
-        win.focus_set()
+        ctk.CTkButton(win, text=S("btn_close"), command=win.destroy, fg_color=ACCENT,
+                      hover_color=ACCENT_HOVER, text_color=ACCENT_TEXT, font=FONTS["btn_small"],
+                      height=38, corner_radius=10).pack(pady=18)
+        # CTkToplevel en Windows a veces aparece detras, y en Linux grab_set
+        # falla si la ventana todavia no es visible: los dos, un poco despues.
+        win.after(150, lambda: (win.lift(), win.focus_force(), win.grab_set()))
 
     def on_close(self):
         self.save()

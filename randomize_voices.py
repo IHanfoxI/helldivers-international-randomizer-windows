@@ -13,7 +13,13 @@ todos. Los fandubs (ru/ko) funcionan igual: si mod_dir es la variante
 +Fandubs, esos idiomas ya estan ahi mismo, no hace falta otra carpeta.
 
 Uso:
-    python randomize_voices.py --mod-dir RUTA [--game-dir RUTA] [--seed N]
+    python randomize_voices.py [--mod-dir RUTA] [--ship-dir RUTA] [--mission-dir RUTA]
+                               [--game-dir RUTA] [--seed N]
+
+Al menos una de las tres carpetas de mod. Ship & Air y Mission solo cambian de
+idioma (un idioma por personaje), no hay tipos de voz ahi. Todo sale en UN
+patch; randomizar un mod suelto reusa lo que la corrida anterior sorteo para
+los otros (ver write_patch).
 
 --mod-dir es la carpeta del mod principal descomprimido (tiene manifest.json
 y las subcarpetas female1/, male1/, etc.). --game-dir es la carpeta data/ del
@@ -87,6 +93,10 @@ def next_patch_num(game_dir):
 
 
 LEDGER = "helldivers_intl_randomizer.json"
+PATCH0 = f"{PATCH_STEM}.patch_0"
+KINDS = ("helldiver", "ship", "mission")
+# carpeta que delata cada tipo de mod descomprimido (ver mod_kind)
+KIND_MARKER = {"helldiver": "female1", "ship": "eagle", "mission": "seaf"}
 
 
 def _stamp(path):
@@ -94,19 +104,28 @@ def _stamp(path):
     return [st.st_size, st.st_mtime_ns]
 
 
-def remove_own_patches(out_dir, log=print):
-    """Borra los patches que escribio una corrida anterior del randomizer.
-    Sin esto se apilan (patch_56..63) y un slot que en esta corrida sale de su
-    mismo tipo no trae grunidos, asi que los de un cruce viejo seguian
-    ganando. Solo borra un archivo si calza tamano+mtime con lo anotado: un
-    Deploy de Arsenal reescribe desde patch_0 y puede reusar ese numero para
-    SU patch, que no hay que tocar."""
-    path = os.path.join(out_dir, LEDGER)
+def load_ledger(out_dir):
+    """{"files": {nombre: [tamano, mtime]}, "parts": {kind: [rutas de patch]}}.
+    "files" es lo que escribio la ultima corrida; "parts" de donde salio, por
+    mod, para poder re-randomizar uno solo sin perder lo sorteado en los otros.
+    El formato viejo (solo {nombre: stamp}) se lee como files sin parts."""
     try:
-        ledger = json.load(open(path))
+        ledger = json.load(open(os.path.join(out_dir, LEDGER)))
     except (OSError, ValueError):
-        return
-    for name, stamp in ledger.items():
+        return {"files": {}, "parts": {}}
+    if "files" not in ledger:
+        ledger = {"files": ledger, "parts": {}}
+    return ledger
+
+
+def remove_own_patches(out_dir, files, log=print):
+    """Borra lo que escribio una corrida anterior del randomizer. Sin esto se
+    apilan (patch_56..63) y un slot que en esta corrida sale de su mismo tipo
+    no trae grunidos, asi que los de un cruce viejo seguian ganando. Solo
+    borra un archivo si calza tamano+mtime con lo anotado: un Deploy de
+    Arsenal reescribe desde patch_0 y puede reusar ese numero para SU patch,
+    que no hay que tocar."""
+    for name, stamp in files.items():
         f = os.path.join(out_dir, name)
         try:
             if _stamp(f) == stamp:
@@ -114,14 +133,14 @@ def remove_own_patches(out_dir, log=print):
                 log(f"  borrado patch anterior: {name}")
         except OSError:
             pass
-    os.remove(path)
 
 
-def remember_patch(out_dir, patch_name):
-    names = [patch_name, patch_name + ".stream"]
-    ledger = {n: _stamp(os.path.join(out_dir, n)) for n in names
-              if os.path.exists(os.path.join(out_dir, n))}
-    json.dump(ledger, open(os.path.join(out_dir, LEDGER), "w"))
+def mod_kind(mod_dir):
+    """"helldiver" / "ship" / "mission" segun las carpetas del mod, o None."""
+    for kind, marker in KIND_MARKER.items():
+        if os.path.isdir(os.path.join(mod_dir, marker)):
+            return kind
+    return None
 
 
 def combo_patch_path(mod_dir, target_voice, src_voice, lang):
@@ -193,20 +212,14 @@ def pick_langs(lang_pools, rng, avoid_repeat=True):
     return None
 
 
-def run_randomize(mod_dir, game_dir, out_dir=None, excluded_langs=(), seed=None, log=print,
-                   fandub_langs=(), slot_modes=None, balance_genders=False,
-                   avoid_repeat_langs=True):
-    """Sortea los 4 slots (excluyendo excluded_langs; ru/ko solo entran si
-    estan en fandub_langs Y mod_dir es la variante +Fandubs) leyendo los
-    patches prearmados de mod_dir, y escribe UN patch combinado en out_dir
-    (o game_dir). slot_modes: {target_short: "own"/"gender"/"any"}.
-    avoid_repeat_langs evita que dos slots salgan con el mismo idioma.
-    Devuelve [(target_short, src_voice_short, src_lang), ...]. Usada por
-    el CLI y por la GUI, mismo camino para las dos."""
-    out_dir = out_dir or game_dir
+def pick_helldiver(mod_dir, rng, excluded_langs=(), log=print, fandub_langs=(),
+                   slot_modes=None, balance_genders=False, avoid_repeat_langs=True):
+    """Sortea los 4 slots Helldiver (excluyendo excluded_langs; ru/ko solo
+    entran si estan en fandub_langs Y mod_dir es la variante +Fandubs).
+    slot_modes: {target_short: "own"/"gender"/"any"}. avoid_repeat_langs
+    evita que dos slots salgan con el mismo idioma. Devuelve
+    ([(target_short, src_voice_short, src_lang), ...], [rutas de patch])."""
     slot_modes = slot_modes or {}
-    rng = random.Random(seed)
-
     short_to_full = {v: k for k, v in bm.VOICE_SHORT.items()}
     picks_src = pick_src_voices(rng, slot_modes, balance_genders)
     src_voice_of = {t: short_to_full[v] for t, v in picks_src.items()}
@@ -222,10 +235,7 @@ def run_randomize(mod_dir, game_dir, out_dir=None, excluded_langs=(), seed=None,
             "idiomas disponibles entre los 4 slots). Excluye menos idiomas, o desactiva "
             "\"no repetir idiomas\".")
 
-    picks = []
-    modified_streams = {}
-    modified_banks = {}
-    modified_sources = {}
+    picks, paths = [], []
     for target in bm.VOICES:
         target_short = bm.VOICE_SHORT[target]
         src_voice = src_voice_of[target_short]
@@ -236,39 +246,126 @@ def run_randomize(mod_dir, game_dir, out_dir=None, excluded_langs=(), seed=None,
                 f"Revisa que la carpeta del mod principal sea la correcta.")
         picks.append((target_short, bm.VOICE_SHORT[src_voice], src_lang))
         log(f"  {target_short:8s} <- {bm.VOICE_SHORT[src_voice]}/{src_lang}")
+        paths.append(combo_patch_path(mod_dir, target, src_voice, src_lang))
+    return picks, paths
 
-        archive = combo_archive(mod_dir, target, src_voice, src_lang)
-        if archive is None:
+
+def npc_slots(mod_dir):
+    """{slot: [idiomas con patch]} de un mod Ship & Air o Mission ya
+    descomprimido (`<slot>/<lang>/<hash>.patch_0`, ver build_npc.gen_patches).
+    La opcion "random" de Mission (mezcla por linea) queda fuera: aca el
+    idioma lo sortea el randomizer."""
+    out = {}
+    for slot in sorted(os.listdir(mod_dir)):
+        d = os.path.join(mod_dir, slot)
+        if not os.path.isdir(d):
             continue
-        modified_streams.update(archive.wwise_streams)
-        modified_banks.update(archive.wwise_banks)      # exertion bank (cross-type), if any
-        modified_sources.update(archive.audio_sources)  # its sources, needed to regenerate it
+        langs = sorted(l for l in os.listdir(d)
+                       if l != "random" and os.path.isfile(os.path.join(d, l, PATCH0)))
+        if langs:
+            out[slot] = langs
+    return out
 
-    if not modified_streams:
+
+def pick_npc(mod_dir, rng, excluded_langs=(), log=print, avoid_repeat_langs=True):
+    """Un idioma por slot del mod NPC. Ship & Air tiene 7 slots: si quedan
+    menos idiomas que slots, no repetir es imposible y se sortea sin esa
+    restriccion en vez de fallar. Devuelve ([(slot, lang), ...], [rutas])."""
+    slots = npc_slots(mod_dir)
+    if not slots:
+        raise ValueError(f"no hay slots de voz en {mod_dir}")
+    pools = {s: [l for l in langs if l not in excluded_langs] for s, langs in slots.items()}
+    lang_picks = (pick_langs(pools, rng, avoid_repeat_langs)
+                  or pick_langs(pools, rng, False))
+    picks, paths = [], []
+    for slot, lang in lang_picks.items():
+        if lang is None:
+            continue
+        picks.append((slot, lang))
+        log(f"  {slot:12s} <- {lang}")
+        paths.append(os.path.join(mod_dir, slot, lang, PATCH0))
+    return picks, paths
+
+
+def write_patch(out_dir, new_parts, log=print):
+    """Escribe UN patch con los patches de new_parts ({kind: [rutas]}) mas lo
+    que la corrida anterior habia sorteado para los otros mods (ledger), y
+    borra el de la corrida anterior. Un solo archivo siempre: randomizar un
+    mod suelto no deja huecos en la cadena .patch_N ni pisa lo de los otros."""
+    ledger = load_ledger(out_dir)
+    parts = {k: v for k, v in ledger["parts"].items()
+             if k not in new_parts and all(os.path.isfile(p) for p in v)}
+    parts.update(new_parts)
+
+    streams, banks, sources = {}, {}, {}
+    for kind in KINDS:
+        for path in parts.get(kind, []):
+            archive = bm.load(path)
+            streams.update(archive.wwise_streams)
+            banks.update(archive.wwise_banks)      # exertion bank (cross-type), if any
+            sources.update(archive.audio_sources)  # its sources, needed to regenerate it
+    if not streams:
         raise ValueError("nada que escribir (revisa las carpetas elegidas)")
 
-    remove_own_patches(out_dir, log)
+    remove_own_patches(out_dir, ledger["files"], log)
     patch = bm.core.GameArchive()
-    num = next_patch_num(out_dir)
-    patch.name = f"{PATCH_STEM}.patch_{num}"
+    patch.name = f"{PATCH_STEM}.patch_{next_patch_num(out_dir)}"
     patch.magic = 0xF0000011
     patch.num_types = patch.num_files = patch.unknown = 0
     patch.unk4Data = bm.PATCH_UNK4
-    patch.audio_sources = modified_sources
-    patch.wwise_banks = modified_banks
-    patch.wwise_streams = modified_streams
+    patch.audio_sources = sources
+    patch.wwise_banks = banks
+    patch.wwise_streams = streams
     patch.text_banks = {}
     patch.video_sources = {}
     bm.write_stream_patch(patch, out_dir)
-    remember_patch(out_dir, patch.name)
+    files = {n: _stamp(os.path.join(out_dir, n))
+             for n in (patch.name, patch.name + ".stream")
+             if os.path.exists(os.path.join(out_dir, n))}
+    json.dump({"files": files, "parts": parts}, open(os.path.join(out_dir, LEDGER), "w"))
     log(f"listo: {patch.name}(+.stream) en {out_dir}")
-    return picks
+
+
+def run_all(game_dir, mod_dirs, out_dir=None, excluded_langs=(), seed=None, log=print,
+            fandub_langs=(), slot_modes=None, balance_genders=False,
+            avoid_repeat_langs=True):
+    """Randomiza los mods de mod_dirs ({kind: carpeta}, al menos uno) y
+    escribe el patch. Devuelve {kind: picks}. Usada por el CLI y la GUI."""
+    if not mod_dirs:
+        raise ValueError("elige al menos una carpeta de mod")
+    rng = random.Random(seed)
+    results, new_parts = {}, {}
+    for kind in KINDS:
+        mod_dir = mod_dirs.get(kind)
+        if not mod_dir:
+            continue
+        if mod_kind(mod_dir) != kind:
+            raise ValueError(f"{mod_dir} no parece el mod {kind} descomprimido "
+                             f"(falta la carpeta {KIND_MARKER[kind]}/)")
+        log(f"[{kind}]")
+        if kind == "helldiver":
+            picks, paths = pick_helldiver(mod_dir, rng, excluded_langs, log, fandub_langs,
+                                          slot_modes, balance_genders, avoid_repeat_langs)
+        else:
+            picks, paths = pick_npc(mod_dir, rng, excluded_langs, log, avoid_repeat_langs)
+        results[kind], new_parts[kind] = picks, paths
+    write_patch(out_dir or game_dir, new_parts, log)
+    return results
+
+
+def run_randomize(mod_dir, game_dir, out_dir=None, **kw):
+    """Solo el mod Helldiver (compatibilidad): [(target, src_voice, lang)]."""
+    return run_all(game_dir, {"helldiver": mod_dir}, out_dir, **kw)["helldiver"]
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mod-dir", required=True,
+    ap.add_argument("--mod-dir", default=None,
                      help="carpeta del mod principal descomprimido (tiene manifest.json)")
+    ap.add_argument("--ship-dir", default=None,
+                     help="carpeta del mod Ship & Air descomprimido (opcional)")
+    ap.add_argument("--mission-dir", default=None,
+                     help="carpeta del mod Mission descomprimido (opcional)")
     ap.add_argument("--game-dir", default=None,
                      help="carpeta data/ de Helldivers 2, destino de escritura "
                           "(default: autodetectar/preguntar)")
@@ -281,7 +378,9 @@ def main():
     args = ap.parse_args()
     game_dir = args.game_dir or find_game_dir()
     excluded = {l.strip() for l in args.exclude.split(",") if l.strip()}
-    run_randomize(args.mod_dir, game_dir, args.out_dir, excluded, args.seed)
+    mod_dirs = {k: d for k, d in (("helldiver", args.mod_dir), ("ship", args.ship_dir),
+                                  ("mission", args.mission_dir)) if d}
+    run_all(game_dir, mod_dirs, args.out_dir, excluded, args.seed)
 
 
 if __name__ == "__main__":
