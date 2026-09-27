@@ -21,7 +21,7 @@ import customtkinter as ctk
 
 STEAM_APPID = "553850"  # Helldivers 2
 DEFAULT_UI_LANG = "us"
-VOICE_ORDER = ["female1", "male1", "female2", "purist"]
+VOICE_ORDER = ["male1", "purist", "female1", "female2"]  # hombre 1, 2, mujer 1, 2
 FANDUB_LANGS = ["ru", "ko"]
 
 # idioma de interfaz -> nombre nativo, para el selector (siempre en su
@@ -35,17 +35,19 @@ UI_LANG_ENDONYMS = {
 }
 UI_LANG_ORDER = ["us", "es", "jp", "de", "fr", "it", "ms", "bp", "cn", "ru", "ko"]
 
-# palabra "predeterminada/o" (o equivalente) por idioma de interfaz, para
-# armar VOICE_DISPLAY como f"{DEFAULT_WORD} {n}" -- copiado del patron ya
-# usado en el manifest del mod (build_mod.STRINGS), version corta.
-DEFAULT_WORD = {
-    "us": "Default", "es": "Predeterminada", "jp": "\u30c7\u30d5\u30a9\u30eb\u30c8",
-    "de": "Standard", "fr": "D\u00e9faut", "it": "Predefinita",
-    "bp": "Padr\u00e3o", "cn": "\u9ed8\u8ba4", "ru": "\u0421\u0442\u0430\u043d\u0434\u0430\u0440\u0442\u043d\u044b\u0439",
-    "ko": "\uae30\ubcf8",
+# nombre de cada voz para el jugador: "Hombre 1", "Mujer 2"... en vez de
+# "Predeterminada 1-4" (el nombre del juego), que no dice que cambio.
+# female1/female2 = mujer 1/2, male1/purist = hombre 1/2.
+VOICE_NUM = {"male1": ("m", 1), "purist": ("m", 2), "female1": ("f", 1), "female2": ("f", 2)}
+VOICE_WORDS = {  # (hombre, mujer)
+    "us": ("Man", "Woman"), "es": ("Hombre", "Mujer"), "jp": ("男性", "女性"),
+    "de": ("Mann", "Frau"), "fr": ("Homme", "Femme"), "it": ("Uomo", "Donna"),
+    "bp": ("Homem", "Mulher"), "cn": ("男声", "女声"),
+    "ru": ("Мужчина", "Женщина"),
+    "ko": ("남성", "여성"),
 }
-DEFAULT_WORD["ms"] = DEFAULT_WORD["es"]
-DEFAULT_WORD_NO_SPACE = {"jp", "cn", "ko"}  # CJK: sin espacio antes del numero
+VOICE_WORDS["ms"] = VOICE_WORDS["es"]
+VOICE_WORDS_NO_SPACE = {"jp", "cn"}  # sin espacio antes del numero
 
 # nombres de idioma de voz por idioma de interfaz (copiado de build_mod.STRINGS
 # para us/es/jp/de/fr/it/bp/cn; ru/ko son nuevos, traducidos a mano)
@@ -665,6 +667,7 @@ I18N["ms"] = I18N["es"]
 # Van aparte y se mezclan en I18N para no reescribir los bloques de arriba. --
 I18N_NPC = {
 "us": {
+    "log_working": 'Randomizing... this can take a minute.', "log_done": 'Done. Start the game to hear the new voices.',
     "ship_title": "Ship & Air Voices",
     "ship_sub": "Optional. Folder where you unzipped \"Helldivers International - ShipAir\". "
                 "Each character (Eagle-1, Pelican-1, ship crew...) gets a random language.",
@@ -677,6 +680,7 @@ I18N_NPC = {
                       "unzipped it.",
 },
 "es": {
+    "log_working": 'Randomizando... puede tardar un minuto.', "log_done": 'Listo. Entra al juego para escuchar las voces nuevas.',
     "ship_title": "Voces de Nave y Aire",
     "ship_sub": "Opcional. Carpeta donde descomprimiste \"Helldivers International - ShipAir\". "
                 "Cada personaje (Águila-1, Pelícano-1, tripulación...) recibe un idioma al azar.",
@@ -689,6 +693,7 @@ I18N_NPC = {
                       "descomprimiste.",
 },
 "jp": {
+    "log_working": 'ランダマイズ中…1分ほどかかることがあります。', "log_done": '完了。ゲームを起動して新しい声を聴いてください。',
     "ship_title": "艦艇・航空ボイス",
     "ship_sub": "任意。「Helldivers International - ShipAir」を解凍したフォルダ。各キャラクター"
                 "（イーグル1、ペリカン1、乗組員など）にランダムな言語が割り当てられます。",
@@ -700,6 +705,7 @@ I18N_NPC = {
     "err_kind_wrong": "そのフォルダは「{name}」MODではありません。解凍したフォルダを選んでください。",
 },
 "de": {
+    "log_working": 'Würfeln... das kann eine Minute dauern.', "log_done": 'Fertig. Starte das Spiel, um die neuen Stimmen zu hören.',
     "ship_title": "Schiffs- & Luftstimmen",
     "ship_sub": "Optional. Ordner, in den du \"Helldivers International - ShipAir\" entpackt "
                 "hast. Jede Figur (Eagle-1, Pelican-1, Schiffscrew...) bekommt eine zufällige "
@@ -713,6 +719,7 @@ I18N_NPC = {
                       "ihn entpackt hast.",
 },
 "fr": {
+    "log_working": 'Randomisation... cela peut prendre une minute.', "log_done": 'Terminé. Lance le jeu pour entendre les nouvelles voix.',
     "ship_title": "Voix Vaisseau & Aérien",
     "ship_sub": "Facultatif. Dossier où tu as décompressé « Helldivers International - "
                 "ShipAir ». Chaque personnage (Eagle-1, Pelican-1, équipage...) reçoit une "
@@ -727,6 +734,7 @@ I18N_NPC = {
                       "décompressé.",
 },
 "it": {
+    "log_working": 'Randomizzazione... può richiedere un minuto.', "log_done": 'Fatto. Avvia il gioco per ascoltare le nuove voci.',
     "ship_title": "Voci Nave & Aria",
     "ship_sub": "Facoltativo. Cartella dove hai estratto \"Helldivers International - ShipAir\". "
                 "Ogni personaggio (Eagle-1, Pelican-1, equipaggio...) riceve una lingua a caso.",
@@ -739,6 +747,7 @@ I18N_NPC = {
                       "estratta.",
 },
 "bp": {
+    "log_working": 'Randomizando... pode levar um minuto.', "log_done": 'Pronto. Entre no jogo para ouvir as novas vozes.',
     "ship_title": "Vozes da Nave e Aéreas",
     "ship_sub": "Opcional. Pasta onde você descompactou \"Helldivers International - ShipAir\". "
                 "Cada personagem (Eagle-1, Pelican-1, tripulação...) recebe um idioma aleatório.",
@@ -751,6 +760,7 @@ I18N_NPC = {
                       "descompactou.",
 },
 "cn": {
+    "log_working": '正在随机分配……可能需要一分钟。', "log_done": '完成。启动游戏即可听到新语音。',
     "ship_title": "舰船与空中语音",
     "ship_sub": "可选。解压「Helldivers International - ShipAir」的文件夹。每个角色（鹰-1、"
                 "鹈鹕-1、舰上人员等）会随机分配一种语言。",
@@ -762,6 +772,7 @@ I18N_NPC = {
     "err_kind_wrong": "该文件夹不是「{name}」MOD。请选择解压它的文件夹。",
 },
 "ru": {
+    "log_working": 'Рандомизация... это может занять минуту.', "log_done": 'Готово. Запустите игру, чтобы услышать новые голоса.',
     "ship_title": "Голоса корабля и авиации",
     "ship_sub": "Необязательно. Папка, куда вы распаковали «Helldivers International - "
                 "ShipAir». Каждый персонаж (Орёл-1, Пеликан-1, экипаж...) получает случайный "
@@ -774,6 +785,7 @@ I18N_NPC = {
     "err_kind_wrong": "Эта папка — не мод «{name}». Выберите папку, куда вы его распаковали.",
 },
 "ko": {
+    "log_working": '랜덤화 중... 1분 정도 걸릴 수 있습니다.', "log_done": '완료. 게임을 실행해 새 음성을 들어보세요.',
     "ship_title": "함선 및 항공 음성",
     "ship_sub": "선택 사항. \"Helldivers International - ShipAir\"의 압축을 푼 폴더. 각 캐릭터"
                 "(이글-1, 펠리컨-1, 승무원 등)에 무작위 언어가 지정됩니다.",
@@ -862,9 +874,9 @@ FONTS = {}  # se llenan en App.__init__ (CTkFont necesita la ventana creada)
 
 
 def voice_display(ui_lang, short):
-    n = VOICE_ORDER.index(short) + 1
-    word = DEFAULT_WORD.get(ui_lang, DEFAULT_WORD["us"])
-    return f"{word}{n}" if ui_lang in DEFAULT_WORD_NO_SPACE else f"{word} {n}"
+    gender, n = VOICE_NUM[short]
+    word = VOICE_WORDS.get(ui_lang, VOICE_WORDS["us"])[gender == "f"]
+    return f"{word}{n}" if ui_lang in VOICE_WORDS_NO_SPACE else f"{word} {n}"
 
 
 def config_path():
@@ -1208,7 +1220,7 @@ class App(ctk.CTk):
         if len(excluded) == len(self.lang_vars):
             messagebox.showerror(S("err_no_langs_title"), S("err_no_langs"))
             return
-        kw = dict(excluded_langs=excluded, log=self.log,
+        kw = dict(excluded_langs=excluded, log=lambda msg: None,  # jerga interna, no al jugador
                   fandub_langs=[c for c, v in self.fandub_vars.items() if v.get()],
                   slot_modes={s: v.get() for s, v in self.mode_vars.items()},
                   balance_genders=self.balance_var.get(),
@@ -1217,6 +1229,7 @@ class App(ctk.CTk):
         self.busy = True
         self._refresh_buttons()
         self.all_btn.configure(text=S("btn_randomizing"))
+        self.log(S("log_working"))
         threading.Thread(target=self._randomize_worker, args=(game_dir, mod_dirs, kw),
                          daemon=True).start()
 
@@ -1226,7 +1239,7 @@ class App(ctk.CTk):
             results = rv.run_all(game_dir, mod_dirs, **kw)
             self.after(0, self._on_randomize_done, results)
         except Exception as e:
-            self.log(f"ERROR: {e}")
+            self.log(f"\u26a0 {e}")
             S = self.S
             self.after(0, lambda: messagebox.showerror(
                 S("err_failed_title"), S("err_failed_body").format(e=e)))
@@ -1242,6 +1255,16 @@ class App(ctk.CTk):
         self._end_busy()
         names = LANG_NAMES.get(self.ui_lang, LANG_NAMES["us"])
         npc_names = NPC_NAMES.get(self.ui_lang, NPC_NAMES["us"])
+        for kind in KINDS:
+            for pick in results.get(kind, []):
+                if kind == "helldiver":
+                    t, s, lang = pick
+                    self.log(f"{voice_display(self.ui_lang, t)} \u2192 "
+                             f"{voice_display(self.ui_lang, s)} \u00b7 {names.get(lang, lang)}")
+                else:
+                    self.log(f"{npc_names.get(pick[0], pick[0])} \u2192 "
+                             f"{names.get(pick[1], pick[1])}")
+        self.log(S("log_done"))
 
         win = ctk.CTkToplevel(self, fg_color=BG)
         win.title(S("result_window_title"))
